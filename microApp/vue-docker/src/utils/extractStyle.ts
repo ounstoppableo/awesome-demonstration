@@ -1,15 +1,19 @@
-export default function extractStyledBlocks(code: string) {
+export default function parseStyleTags(styleString: string) {
   const regex =
-    /<style[^>]*lang=["'](scss|sass|less)["'][^>]*>([\s\S]*?)<\/style>/g;
-  let match;
-  const results = [];
+    /<style\b(?:\s+(scoped))?(?:\s+lang=["']?(sass|scss|less|css)["']?)?[^>]*>([\s\S]*?)<\/style>/gi;
+  const matches = [...styleString.matchAll(regex)];
 
-  while ((match = regex.exec(code)) !== null) {
-    results.push({
-      lang: match[1], // 语言类型 (scss/sass/less)
-      content: match[2], // 样式内容
-    });
-  }
+  return matches.map((match) => {
+    const lang = match[2] || 'css'; // 默认 'css'
+    const content = match[3].trim();
 
-  return results;
+    // 单独检测 scoped 属性
+    const scoped = /<style\b[^>]*\bscoped\b/i.test(match[0]);
+
+    return {
+      lang,
+      scoped,
+      content,
+    };
+  });
 }

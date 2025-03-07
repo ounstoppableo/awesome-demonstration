@@ -18,6 +18,8 @@ export default [
   "\"less\"",
   "'pinia'",
   "\"pinia\"",
+  "'sass'",
+  "\"sass\"",
   "'scss'",
   "\"scss\"",
   "'uuid'",

@@ -243,6 +243,9 @@ importers:
       pinia:
         specifier: ^3.0.1
         version: 3.0.1(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
+      sass:
+        specifier: ^1.85.1
+        version: 1.85.1
       scss:
         specifier: ^0.2.4
         version: 0.2.4
@@ -9307,7 +9310,6 @@ snapshots:
   chokidar@4.0.3:
     dependencies:
       readdirp: 4.1.2
-    optional: true
 
   chownr@2.0.0: {}
 
@@ -10492,8 +10494,7 @@ snapshots:
 
   immer@10.1.1: {}
 
-  immutable@5.0.3:
-    optional: true
+  immutable@5.0.3: {}
 
   import-fresh@3.3.1:
     dependencies:
@@ -12163,8 +12164,7 @@ snapshots:
     dependencies:
       picomatch: 2.3.1
 
-  readdirp@4.1.2:
-    optional: true
+  readdirp@4.1.2: {}
 
   redent@3.0.0:
     dependencies:
@@ -12315,7 +12315,6 @@ snapshots:
       source-map-js: 1.2.1
     optionalDependencies:
       '@parcel/watcher': 2.5.1
-    optional: true
 
   sax@1.4.1:
     optional: true

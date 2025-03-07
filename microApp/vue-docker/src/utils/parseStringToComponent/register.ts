@@ -6,7 +6,7 @@ import { useViewInfoStoreStore } from '@/store/viewInfoStore';
 import * as Vue from 'vue';
 //@ts-ignore
 import { loadModule } from 'vue3-sfc-loader';
-import extractStyledBlocks from '../extractStyle';
+import parseStyleTag from '../extractStyle';
 //@ts-ignore
 import { compileString } from 'sass';
 //@ts-ignore
@@ -37,24 +37,34 @@ export function Register(target: typeof ParseStringToComponent, _: any) {
       const options = {
         moduleCache: { vue: Vue },
         async getFile(url?: any) {
-          const rawStyle = extractStyledBlocks(componentString);
+          const rawStyle = parseStyleTag(componentString);
           let styleString = '<style scoped>';
-          await Promise.all(
-            rawStyle.map(async (style) => {
-              if (style.lang === 'scss' || style.lang === 'sass') {
-                styleString += (await compileString(style.content)).css;
+          document
+            .querySelectorAll(`[id^="${'style' + name}"]`)
+            .forEach((item) => item.remove());
+          for (let i = 0; i < rawStyle.length; i++) {
+            document.getElementById('style' + name + i)?.remove();
+            if (rawStyle[i].scoped === true) {
+              if (rawStyle[i].lang === 'scss' || rawStyle[i].lang === 'sass') {
+                styleString += (await compileString(rawStyle[i].content)).css;
               }
-              if (style.lang === 'less') {
-                styleString += (await less.render(style.content)).css;
+              if (rawStyle[i].lang === 'less') {
+                styleString += (await less.render(rawStyle[i].content)).css;
               }
-            }),
-          );
+              if (rawStyle[i].lang === 'css') {
+                styleString += rawStyle[i].content;
+              }
+            } else {
+              const styleDom = document.createElement('style');
+              styleDom.id = 'style' + name + i;
+              styleDom.innerHTML = rawStyle[i].content;
+              document.head.append(styleDom);
+            }
+          }
           styleString += '</style>';
           return Promise.resolve(
-            componentString.replace(
-              /<style[^>]*lang=["'](scss|sass|less)["'][^>]*>([\s\S]*?)<\/style>/g,
-              '',
-            ) + styleString,
+            componentString.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, '') +
+              styleString,
           );
         },
         addStyle(styleString: any) {
