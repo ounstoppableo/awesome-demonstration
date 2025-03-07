@@ -29,7 +29,10 @@ export class LegalStringCheck {
   }
 
   async checkPackageNotFromOuter(fileName: string) {
-    const relaventImports = this.componentInfo.relevantPackages;
+    const relaventImports = [
+      ...this.componentInfo.relevantPackages,
+      ...this.componentInfo.externalFiles.map((file: any) => file.fileName),
+    ];
     if (!relaventImports.includes(fileName))
       throw new Error('不要在编辑器中引入外部包！');
   }
@@ -460,11 +463,34 @@ export default class ParseStringToComponent {
     const imports =
       CommonParseTools.getImportVariableFromContent(importStateMent);
     for (let i = 0; i < imports.length; i++) {
-      const importContent = await this.handleGetFileContent(imports[i].source);
-      this.generateModuleValue(
-        imports[i].source,
-        CommonParseTools.tsxTransJsx(importContent),
-      );
+      if (
+        this.componentInfo.externalFiles
+          .map((file: any) => file.fileName)
+          .includes(imports[i].source)
+      ) {
+        const script = document.createElement('script');
+        script.src = this.componentInfo.externalFiles.find(
+          (file: any) => file.fileName === imports[i].source,
+        ).filePath;
+        document.head.appendChild(script);
+        await new Promise((resolve) => {
+          script.onload = () => {
+            resolve(null);
+          };
+          script.onerror = () => {
+            resolve(null);
+          };
+        });
+      }
+      if (this.componentInfo.relevantPackages.includes(imports[i].source)) {
+        const importContent = await this.handleGetFileContent(
+          imports[i].source,
+        );
+        this.generateModuleValue(
+          imports[i].source,
+          CommonParseTools.tsxTransJsx(importContent),
+        );
+      }
     }
 
     return `
@@ -536,10 +562,7 @@ export default class ParseStringToComponent {
     else return '';
   }
 
-  async handleDisposeImportVueComponent(
-    fileName: string,
-    name: string,
-  ) {
+  async handleDisposeImportVueComponent(fileName: string, name: string) {
     if (ParseStringToComponent._parseLanguage === 'vue')
       throw new Error('handleDisposeImportVueComponent应该注册!');
   }

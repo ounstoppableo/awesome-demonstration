@@ -140,8 +140,6 @@ export default function useAddComponentForm(props?: any) {
         setActiveStep(e);
       },
       (params) => {
-        console.log(params);
-        console.log(form.getValues());
         if (activeStep > e) {
           form.clearErrors();
           return setActiveStep(e);
@@ -448,8 +446,12 @@ export default function useAddComponentForm(props?: any) {
                                         res.data[0]?.filePath,
                                       );
                                       if (
-                                        res.data[0]?.fileName?.endsWith('.ts') ||
-                                        res.data[0]?.fileName?.endsWith('.js') ||
+                                        res.data[0]?.fileName?.endsWith(
+                                          '.ts',
+                                        ) ||
+                                        res.data[0]?.fileName?.endsWith(
+                                          '.js',
+                                        ) ||
                                         res.data[0]?.fileName?.endsWith(
                                           '.tsx',
                                         ) ||
@@ -478,7 +480,16 @@ export default function useAddComponentForm(props?: any) {
                                                         file.fileName ===
                                                         resItem,
                                                     )?.filePath || '',
-                                                external: false,
+                                                external:
+                                                  form
+                                                    .getValues(
+                                                      `files.${framework}.relevantFiles` as any,
+                                                    )
+                                                    .find(
+                                                      (file: any) =>
+                                                        file.fileName ===
+                                                        resItem,
+                                                    )?.external || false,
                                               }),
                                             );
                                             form.setValue(
@@ -539,7 +550,7 @@ export default function useAddComponentForm(props?: any) {
                                       filePath: '',
                                       external: false,
                                     };
-                                    console.log(originalValue);
+
                                     form.setValue(
                                       'files.html.relevantFiles',
                                       originalValue
@@ -667,7 +678,17 @@ export default function useAddComponentForm(props?: any) {
                                                                     resItem,
                                                                 )?.filePath ||
                                                               '',
-                                                            external: false,
+                                                            external:
+                                                              form
+                                                                .getValues(
+                                                                  `files.${framework}.relevantFiles` as any,
+                                                                )
+                                                                .find(
+                                                                  (file: any) =>
+                                                                    file.fileName ===
+                                                                    resItem,
+                                                                )?.external ||
+                                                              false,
                                                           }),
                                                         );
                                                       const relevantFileId =

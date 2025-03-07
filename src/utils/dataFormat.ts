@@ -13,9 +13,6 @@ export const formatDataToViewerAdaptor = (
   data: ComponentInfoFromBackend,
   currentFramework: string,
 ): ComponentInfoForViewerType => {
-  console.log(
-    data[`${currentFramework}EntryFileName` as keyof ComponentInfoFromBackend],
-  );
   return {
     id: data.id,
     entryFile: data[

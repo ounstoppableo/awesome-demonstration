@@ -216,7 +216,7 @@ export default function MainPage() {
       <div className="absolute overflow-hidden w-full h-full pt-24">
         <Carousel slides={slideData} />
       </div>
-      <div className="absolute z-[200] flex items-center bottom-12 justify-center h-fit w-fit select-none left-[50%] translate-x-[-50%]">
+      <div className="absolute z-[48] flex items-center bottom-12 justify-center h-fit w-fit select-none left-[50%] translate-x-[-50%]">
         <FloatingDock mobileClassName="translate-y-20" items={links} />
       </div>
       {auth ? (

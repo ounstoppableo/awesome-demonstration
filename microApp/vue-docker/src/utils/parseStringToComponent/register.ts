@@ -38,7 +38,7 @@ export function Register(target: typeof ParseStringToComponent, _: any) {
         moduleCache: { vue: Vue },
         async getFile(url?: any) {
           const rawStyle = extractStyledBlocks(componentString);
-          let styleString = '<style>';
+          let styleString = '<style scoped>';
           await Promise.all(
             rawStyle.map(async (style) => {
               if (style.lang === 'scss' || style.lang === 'sass') {
