@@ -6,6 +6,11 @@ import { useViewInfoStoreStore } from '@/store/viewInfoStore';
 import * as Vue from 'vue';
 //@ts-ignore
 import { loadModule } from 'vue3-sfc-loader';
+import extractStyledBlocks from '../extractStyle';
+//@ts-ignore
+import { compileString } from 'sass';
+//@ts-ignore
+import less from 'less';
 
 export function Register(target: typeof ParseStringToComponent, _: any) {
   class RegisteredParseStringComponent extends target {
@@ -32,7 +37,25 @@ export function Register(target: typeof ParseStringToComponent, _: any) {
       const options = {
         moduleCache: { vue: Vue },
         async getFile(url?: any) {
-          return Promise.resolve(componentString);
+          const rawStyle = extractStyledBlocks(componentString);
+          let styleString = '<style>';
+          await Promise.all(
+            rawStyle.map(async (style) => {
+              if (style.lang === 'scss' || style.lang === 'sass') {
+                styleString += (await compileString(style.content)).css;
+              }
+              if (style.lang === 'less') {
+                styleString += (await less.render(style.content)).css;
+              }
+            }),
+          );
+          styleString += '</style>';
+          return Promise.resolve(
+            componentString.replace(
+              /<style[^>]*lang=["'](scss|sass|less)["'][^>]*>([\s\S]*?)<\/style>/g,
+              '',
+            ) + styleString,
+          );
         },
         addStyle(styleString: any) {
           let style = document.getElementById(name);
