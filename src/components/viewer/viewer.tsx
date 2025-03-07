@@ -18,6 +18,7 @@ export default function Viewer(props: {
   const [showLoading, setShowLoading] = useState(true);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const iframeRef = useRef<any>(null);
+  const soleId = useRef('');
   const [errorInfo, setErrorInfo] = useState<{
     title: string;
     content: string;
@@ -46,17 +47,20 @@ export default function Viewer(props: {
       componentInfoForParent,
       setShowLoading,
       getServerAddr: getServerAddr,
+      soleId,
     }).framework;
   } else {
     framework = useStoreInfo({
       iframeRef,
       setShowLoading,
       getServerAddr: getServerAddr,
+      soleId,
     }).framework;
   }
 
   useEffect(() => {
     const _cb = (e: any) => {
+      if (e.data.id !== soleId.current) return;
       if (
         e.data.type === 'componentLoadCompleted' ||
         e.data.type === 'handleCompileError'
@@ -71,6 +75,7 @@ export default function Viewer(props: {
   }, []);
 
   const handleOnMessage = (e: any) => {
+    if (e.data.id !== soleId.current) return;
     if (e.data.type === 'componentLoadCompleted') {
       setShowErrorAlert(false);
       setErrorInfo({

@@ -156,7 +156,7 @@ export default function MainPage() {
     getComponentList().then(async (res) => {
       if (res.code === 200) {
         const slideData: any = await Promise.all(
-          res.data.map(async (item: any) => {
+          res.data.map(async (item: any, index: any) => {
             const componentInfoForViewer = formatDataToViewerAdaptor(
               item,
               item.framework[0],
@@ -183,6 +183,7 @@ export default function MainPage() {
               },
               slot: (
                 <Viewer
+                  key={index}
                   componentInfoForParent={componentInfoForViewer}
                 ></Viewer>
               ),

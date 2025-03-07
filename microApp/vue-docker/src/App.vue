@@ -1,14 +1,23 @@
 <script setup lang="ts">
 // @ts-ignore
-import { inject, onMounted, ref, nextTick } from 'vue';
+import { inject, onMounted, ref, nextTick, markRaw } from 'vue';
 import ParseStringToComponent from './utils/parseStringToComponent/parseStringToComponent';
 import { useViewInfoStoreStore } from './store/viewInfoStore';
+import { v4 as uuidv4 } from 'uuid';
 
 const componentName = ref('');
 const app: any = inject('app');
 const randomKey = ref(Math.random());
+const soleId = markRaw({ value: uuidv4() });
 
 const viewInfoStoreState = useViewInfoStoreStore();
+
+app.config.errorHandler = (err: any, instance: any, info: any) => {
+  window.parent.postMessage(
+    { type: 'handleCompileError', data: err.message, id: soleId.value },
+    location.protocol + '//' + location.hostname + ':7777',
+  );
+};
 
 onMounted(() => {
   window.addEventListener('message', async (e) => {
@@ -28,13 +37,17 @@ onMounted(() => {
         componentName.value = 'viewerRoot';
         nextTick(() => {
           window.parent.postMessage(
-            { type: 'componentLoadCompleted', data: '组件加载完成~' },
+            {
+              type: 'componentLoadCompleted',
+              data: '组件加载完成~',
+              id: soleId.value,
+            },
             location.protocol + '//' + location.hostname + ':7777',
           );
         });
       } catch (err: any) {
         window.parent.postMessage(
-          { type: 'handleCompileError', data: err.message },
+          { type: 'handleCompileError', data: err.message, id: soleId.value },
           location.protocol + '//' + location.hostname + ':7777',
         );
       }
@@ -50,21 +63,36 @@ onMounted(() => {
     if (e.data.type === 'setNoScrollBar') {
       document.documentElement.classList.add('noScrollBar');
     }
+    if (e.data.type === 'secondHandshake') {
+      window.parent.postMessage(
+        {
+          type: 'thirdHandShake',
+          data: '二次握手成功~',
+          id: soleId.value,
+          secondHandshakeId: e.data.id,
+        },
+        location.protocol + '//' + location.hostname + ':7777',
+      );
+    }
   });
   window.parent.postMessage(
-    { type: 'frameworkReady', data: '我准备好了~' },
+    { type: 'frameworkReady', data: '我准备好了~', id: soleId.value },
     location.protocol + '//' + location.hostname + ':7777',
   );
+  (window as any).id = soleId.value;
 });
 </script>
 
 <template>
-  <div v-if="componentName" style="
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      ">
+  <div
+    v-if="componentName"
+    style="
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    "
+  >
     <Suspense>
       <component :is="componentName" :key="randomKey"></component>
     </Suspense>

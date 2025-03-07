@@ -108,9 +108,10 @@ export const formatDataForBackendAdaptor = (
     reactRelevantFiles: [] as any,
     reactExternalFiles: [] as any,
   };
-  storeSchema.id = formContent.editComponentId
-    ? formContent.editComponentId
-    : uuidv4();
+  storeSchema.id =
+    formContent.editComponentId && formContent.editComponentId !== 'default'
+      ? formContent.editComponentId
+      : uuidv4();
   storeSchema.name = formContent.componentName;
   storeSchema.framework = formContent.framework;
   storeSchema.vueEntryFileName = formContent.files?.vue?.entryFile

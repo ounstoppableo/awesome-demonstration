@@ -9,6 +9,7 @@ import { useAppSelector } from '@/store/hooks';
 import { isEqual } from 'lodash';
 import ParseStringToComponent from '@/utils/parseStringToComponent/parseStringToComponent';
 import NotFound from '@/components/not-found';
+import { v4 as uuidv4 } from 'uuid';
 
 function useDeepCompareEffect(
   callback: (...params: any) => any,
@@ -27,11 +28,13 @@ export default function Viewer() {
   const dispatch = useDispatch();
   const componentInfo = useAppSelector(selectComponentInfo);
   const [randomKey, setRandomKey] = useState(Math.random());
+  const soleId = useRef(uuidv4());
   useEffect(() => {
     window.parent.postMessage(
-      { type: 'frameworkReady', data: '我准备好了~' },
+      { type: 'frameworkReady', data: '我准备好了~', id: soleId.current },
       location.origin,
     );
+    (window as any).id = soleId.current;
     const handleMsgCb = async (e: any) => {
       if (e.origin !== location.protocol + '//' + location.hostname + ':7777') {
         console.warn('拒绝来自不安全域的消息:', e.origin);
@@ -52,6 +55,17 @@ export default function Viewer() {
       if (e.data.type === 'setNoScrollBar') {
         document.documentElement.classList.add('noScrollBar');
       }
+      if (e.data.type === 'secondHandshake') {
+        window.parent.postMessage(
+          {
+            type: 'thirdHandShake',
+            data: '二次握手成功~',
+            id: soleId,
+            secondHandshakeId: e.data.id,
+          },
+          location.protocol + '//' + location.hostname + ':7777',
+        );
+      }
     };
     window.addEventListener('message', handleMsgCb);
     return () => {
@@ -70,12 +84,16 @@ export default function Viewer() {
         );
         setRoot(components as any);
         window.parent.postMessage(
-          { type: 'componentLoadCompleted', data: '组件加载完成~' },
+          {
+            type: 'componentLoadCompleted',
+            data: '组件加载完成~',
+            id: soleId.current,
+          },
           location.origin,
         );
       } catch (err: any) {
         window.parent.postMessage(
-          { type: 'handleCompileError', data: err.message },
+          { type: 'handleCompileError', data: err.message, id: soleId.current },
           location.origin,
         );
       }
@@ -102,7 +120,7 @@ export default function Viewer() {
     } catch (err: any) {
       console.log(err);
       window.parent.postMessage(
-        { type: 'handleCompileError', data: err.message },
+        { type: 'handleCompileError', data: err.message, id: soleId.current },
         location.origin,
       );
     }

@@ -237,9 +237,18 @@ importers:
       eslint:
         specifier: ^9
         version: 9.19.0(jiti@1.21.7)
+      less:
+        specifier: ^4.2.2
+        version: 4.2.2
       pinia:
         specifier: ^3.0.1
         version: 3.0.1(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
+      scss:
+        specifier: ^0.2.4
+        version: 0.2.4
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -4912,6 +4921,10 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
+  ometa@0.2.2:
+    resolution: {integrity: sha512-LZuoK/yjU3FvrxPjUXUlZ1bavCfBPqauA7fsNdwi+AVhRdyk2IzgP3JRnevvjzQ6fKHdUw8YISshf53FmpHrng==}
+    engines: {node: '>= 0.2.0'}
+
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
@@ -5618,6 +5631,10 @@ packages:
   schema-utils@4.3.0:
     resolution: {integrity: sha512-Gf9qqc58SpCA/xdziiHz35F4GNIWYWZrEshUc/G/r5BnLph6xpKuLeoJoQuj5WfBIx/eQLf+hmVPYHaxJu7V2g==}
     engines: {node: '>= 10.13.0'}
+
+  scss@0.2.4:
+    resolution: {integrity: sha512-4u8V87F+Q/upVhUmhPnB4C1R11xojkRkWjExL2v0CX2EXTg18VrKd+9JWoeyCp2VEMdSpJsyAvVU+rVjogh51A==}
+    engines: {node: '>= 0.2.0'}
 
   semver@5.7.2:
     resolution: {integrity: sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==}
@@ -11549,6 +11566,8 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
+  ometa@0.2.2: {}
+
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
@@ -12315,6 +12334,10 @@ snapshots:
       ajv: 8.17.1
       ajv-formats: 2.1.1(ajv@8.17.1)
       ajv-keywords: 5.1.0(ajv@8.17.1)
+
+  scss@0.2.4:
+    dependencies:
+      ometa: 0.2.2
 
   semver@5.7.2: {}
 

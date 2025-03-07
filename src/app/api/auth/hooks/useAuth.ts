@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 export default async function useAuth() {
   const headersList = await headers();
   const Authorization = headersList.get('Authorization');
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
   try {
     const authRes = await (
       await fetch(process.env.AUTH_ADDR as string, {

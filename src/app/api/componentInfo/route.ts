@@ -155,9 +155,17 @@ export async function POST(req: NextRequest) {
 
         await connection
           .query(
-            `${formContent.addOrEdit === 'add' ? 'inset into' : 'update'} componentInfo set ? ${formContent.addOrEdit === 'edit' ? '' : 'where id=?'};`,
+            `${
+              formContent.addOrEdit === 'add'
+                ? `INSERT INTO componentInfo (${Object.keys(storeSchema)
+                    .map((key) => `\`${key}\``)
+                    .join(',')}) VALUES (${Object.keys(storeSchema)
+                    .map((key) => '?')
+                    .join(',')})`
+                : 'update componentInfo set ? where id=?'
+            };`,
             formContent.addOrEdit === 'add'
-              ? storeSchema
+              ? Object.values(storeSchema)
               : [storeSchema, storeSchema.id],
           )
           .then(() => {

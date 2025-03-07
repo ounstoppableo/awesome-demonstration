@@ -30,10 +30,12 @@
     <div id="root"></div>
     <script>
       const rootDom = document.getElementById('root');
+      const soleId = Math.random().toString(36).slice(2);
       window.parent.postMessage(
-        { type: 'frameworkReady', data: '我准备好了~' },
+        { type: 'frameworkReady', data: '我准备好了~', id: soleId },
         location.protocol + '//' + location.hostname + ':7777',
       );
+      window.id = soleId;
       window.addEventListener('message', async (e) => {
         if (
           e.origin !==
@@ -111,7 +113,11 @@
             }
           }
           window.parent.postMessage(
-            { type: 'componentLoadCompleted', data: '组件加载完成~' },
+            {
+              type: 'componentLoadCompleted',
+              data: '组件加载完成~',
+              id: soleId,
+            },
             location.protocol + '//' + location.hostname + ':7777',
           );
         }
@@ -126,6 +132,17 @@
         }
         if (e.data.type === 'setNoScrollBar') {
           document.documentElement.classList.add('noScrollBar');
+        }
+        if (e.data.type === 'secondHandshake') {
+          window.parent.postMessage(
+            {
+              type: 'thirdHandShake',
+              data: '二次握手成功~',
+              id: soleId,
+              secondHandshakeId: e.data.id,
+            },
+            location.protocol + '//' + location.hostname + ':7777',
+          );
         }
       });
     </script>
