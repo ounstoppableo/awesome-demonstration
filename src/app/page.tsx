@@ -215,13 +215,15 @@ export default function MainPage() {
   } = useAddComponentForm();
 
   return (
-    <div className="h-[100vh]">
+    <div className="h-[100vh] w-[100vw] overflow-hidden">
       {alertVDom}
-      <div className="absolute overflow-hidden w-full h-full pt-24">
-        <Carousel slides={slideData} />
-      </div>
-      <div className="absolute z-[48] flex items-center bottom-12 justify-center h-fit w-fit select-none left-[50%] translate-x-[-50%]">
-        <FloatingDock mobileClassName="translate-y-20" items={links} />
+      <div className="flex flex-col items-center justify-end gap-[6%] h-full w-full">
+        <div className="w-full">
+          <Carousel slides={slideData} />
+        </div>
+        <div className="z-[48] flex items-center justify-center h-fit w-fit select-none pb-[2%]">
+          <FloatingDock mobileClassName="translate-y-20" items={links} />
+        </div>
       </div>
       {auth ? (
         <Dialog>

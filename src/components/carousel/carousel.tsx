@@ -103,8 +103,15 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
           >
             {slot}
           </div>
-          {current === index && (
-            <div className="absolute inset-[2px] rounded-[5%] group-hover:bg-black/20 transition-all duration-1000" />
+          {current === index ? (
+            <div className="absolute inset-[2px] rounded-[5%] group-hover:bg-black/20 transition-all duration-1000"></div>
+          ) : (
+            <></>
+          )}
+          {current !== index ? (
+            <div className="absolute inset-[2px] rounded-[5%] bg-black/10 transition-all duration-1000"></div>
+          ) : (
+            <></>
           )}
         </div>
 
