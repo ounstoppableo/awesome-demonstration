@@ -887,6 +887,13 @@ export default function useAddComponentForm(props: any) {
             )}
           </>
         );
+      case 3:
+        return (
+          <div className="p-4 flex justify-center items-center text-[24px] font-bold">
+            <span className="scale-x-[-1]">🎉🎉</span>
+            <span className='gradiant-text animate-gradientMove'>Good Job!!!</span>🎉🎉
+          </div>
+        );
     }
   };
   const AddComponentForm = (

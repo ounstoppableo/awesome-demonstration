@@ -240,7 +240,7 @@ export default function MainPage() {
   return (
     <div className="h-[100vh] w-[100vw] overflow-hidden">
       {alertVDom}
-      <div className="flex flex-col items-center justify-end gap-[6%] h-full w-full">
+      <div className="flex flex-col items-center justify-end gap-[6%] absolute inset-0 overflow-hidden">
         <div className="w-full">
           <Carousel slides={slideData} />
         </div>
@@ -251,7 +251,7 @@ export default function MainPage() {
       {auth ? (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger>
-            <div className="absolute left-2 h-10 w-10 z-40 text-neutral-600 dark:text-neutral-200 bottom-12 rounded-[2.5rem] hover:w-48 bg-neutral-200 dark:bg-neutral-800 transition-all duration-300 overflow-hidden">
+            <div className="absolute left-2 h-10 w-10 z-40 text-neutral-600 dark:text-neutral-200 bottom-[5%] rounded-[2.5rem] hover:w-48 bg-neutral-200 dark:bg-neutral-800 transition-all duration-300 overflow-hidden">
               <div className="h-10 w-10 rounded-[9999px]  flex justify-center items-center">
                 <Plus />
                 <div className="absolute w-40 left-7">Add Component</div>

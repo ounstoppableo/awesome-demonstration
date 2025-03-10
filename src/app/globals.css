@@ -91,12 +91,12 @@ body {
   --scrollBarWidth: 6px;
   --flowing-light: linear-gradient(
     60deg,
-    hsl(353, 100%, 72%),
-    hsl(279, 81%, 75%),
-    hsl(266, 80%, 69%),
-    hsl(181, 100%, 44%),
-    hsl(345, 87%, 88%),
-    hsl(18, 96%, 80%)
+    #f15f79,
+    #12c2e9,
+    #b24592,
+    #c471ed,
+    #91eae4,
+    #7f7fd5
   );
 }
 
