@@ -207,8 +207,12 @@ export default function MainPage() {
 
   const { alertVDom } = useAlert({});
 
-  const { formStep, AddComponentForm, handleSubmitBtnClick } =
-    useAddComponentForm();
+  const {
+    formStep,
+    AddComponentForm,
+    handleSubmitBtnClick,
+    showLoadingForStepTwo,
+  } = useAddComponentForm();
 
   return (
     <div className="h-[100vh]">
@@ -229,7 +233,7 @@ export default function MainPage() {
               </div>
             </div>
           </DialogTrigger>
-          <DialogContent className="w-fit">
+          <DialogContent className="w-fit overflow-hidden">
             <DialogHeader>
               <DialogTitle>Add Component</DialogTitle>
               <DialogDescription>
@@ -237,6 +241,10 @@ export default function MainPage() {
               </DialogDescription>
             </DialogHeader>
             {AddComponentForm}
+            <Loading
+              showLoading={showLoadingForStepTwo}
+              cubeSize={60}
+            ></Loading>
             <DialogFooter>
               <Button type="submit" onClick={handleSubmitBtnClick}>
                 {formStep === 1 || formStep === 2 ? 'Next' : 'Save'}

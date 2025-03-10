@@ -247,33 +247,37 @@ export default function useAddComponentForm(props?: any) {
                         <SelectTrigger className="[&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 [&>span_svg]:text-muted-foreground/80 w-[180px]">
                           <SelectValue placeholder="Select operate type" />
                         </SelectTrigger>
-                        <SelectContent className="[&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2">
-                          <SelectGroup>
-                            {componentList.length !== 0 ? (
-                              componentList.map((component: any) => {
-                                return (
-                                  <SelectItem
-                                    value={component.id}
-                                    key={component.id}
-                                  >
-                                    <Component />
-                                    <span className="truncate">
-                                      {component.name}
-                                    </span>
-                                  </SelectItem>
-                                );
-                              })
-                            ) : showLoadingForStepOneSelectItems ? (
-                              <div className="relative h-24 w-full">
-                                <Loading
-                                  showLoading={showLoadingForStepOneSelectItems}
-                                  cubeSize={30}
-                                ></Loading>
-                              </div>
-                            ) : (
-                              <></>
-                            )}
-                          </SelectGroup>
+                        <SelectContent
+                          className={`[&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 ${showLoadingForStepOneSelectItems ? '' : '[&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2'}`}
+                        >
+                          {showLoadingForStepOneSelectItems ? (
+                            <div className="relative h-24 w-full">
+                              <Loading
+                                showLoading={showLoadingForStepOneSelectItems}
+                                cubeSize={30}
+                              ></Loading>
+                            </div>
+                          ) : (
+                            <SelectGroup>
+                              {componentList.length !== 0 ? (
+                                componentList.map((component: any) => {
+                                  return (
+                                    <SelectItem
+                                      value={component.id}
+                                      key={component.id}
+                                    >
+                                      <Component />
+                                      <span className="truncate">
+                                        {component.name}
+                                      </span>
+                                    </SelectItem>
+                                  );
+                                })
+                              ) : (
+                                <></>
+                              )}
+                            </SelectGroup>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -866,10 +870,6 @@ export default function useAddComponentForm(props?: any) {
                 })}
               </Tabs>
             )}
-            <Loading
-              showLoading={showLoadingForStepTwo}
-              cubeSize={60}
-            ></Loading>
           </>
         );
     }
@@ -900,5 +900,6 @@ export default function useAddComponentForm(props?: any) {
     formStep: activeStep,
     AddComponentForm,
     handleSubmitBtnClick,
+    showLoadingForStepTwo,
   };
 }
