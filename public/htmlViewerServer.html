@@ -125,13 +125,19 @@
                 }
               }
               if (relevantPackage.endsWith('.js')) {
+                document.getElementById(relevantPackage + 'js') &&
+                  document.getElementById(relevantPackage + 'js').remove();
                 const scriptDom = document.createElement('script');
                 scriptDom.innerHTML = fileContent;
+                scriptDom.id = relevantPackage;
                 document.body.append(scriptDom);
               }
               if (relevantPackage.endsWith('.css')) {
+                document.getElementById(relevantPackage + 'css') &&
+                  document.getElementById(relevantPackage + 'css').remove();
                 const styleDom = document.createElement('style');
                 styleDom.innerHTML = fileContent;
+                styleDom.id = relevantPackage;
                 document.body.append(styleDom);
               }
             }

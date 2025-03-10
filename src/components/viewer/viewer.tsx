@@ -76,13 +76,13 @@ export default function Viewer(props: {
 
   const handleOnMessage = (e: any) => {
     if (e.data.id !== soleId.current) return;
-    // if (e.data.type === 'componentLoadCompleted') {
-    //   setShowErrorAlert(false);
-    //   setErrorInfo({
-    //     title: 'Some Errors Happened',
-    //     content: '',
-    //   });
-    // }
+    if (e.data.type === 'componentLoadCompleted') {
+      setShowErrorAlert(false);
+      setErrorInfo({
+        title: 'Some Errors Happened',
+        content: '',
+      });
+    }
     if (e.data.type === 'handleCompileError') {
       setShowErrorAlert(true);
       setErrorInfo({

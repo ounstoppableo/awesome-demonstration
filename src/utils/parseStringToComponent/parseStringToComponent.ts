@@ -463,15 +463,14 @@ export default class ParseStringToComponent {
     const imports =
       CommonParseTools.getImportVariableFromContent(importStateMent);
     for (let i = 0; i < imports.length; i++) {
-      if (
-        this.componentInfo.externalFiles
-          .map((file: any) => file.fileName)
-          .includes(imports[i].source)
-      ) {
+      const target = this.componentInfo.externalFiles.find(
+        (file: any) => file.fileName === imports[i].source,
+      );
+      if (target) {
+        document.getElementById(target.fileName)?.remove();
         const script = document.createElement('script');
-        script.src = this.componentInfo.externalFiles.find(
-          (file: any) => file.fileName === imports[i].source,
-        ).filePath;
+        script.id = target.fileName;
+        script.src = target.filePath;
         document.head.appendChild(script);
         await new Promise((resolve) => {
           script.onload = () => {
