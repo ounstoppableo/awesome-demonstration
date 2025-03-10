@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Viewer</title>
     <style>
+      :root {
+        --scrollBarWidth: 6px;
+        --flowing-light: linear-gradient(
+          60deg,
+          hsl(353, 100%, 72%),
+          hsl(279, 81%, 75%),
+          hsl(266, 80%, 69%),
+          hsl(181, 100%, 44%),
+          hsl(345, 87%, 88%),
+          hsl(18, 96%, 80%)
+        );
+      }
+      /* 自定义滚动条样式 */
+      ::-webkit-scrollbar {
+        width: var(--scrollBarWidth); /* 控制滚动条的宽度 */
+        height: var(--scrollBarWidth); /* 控制横向滚动条的高度 */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.3); /* 设置拇指的颜色 */
+        border-radius: 9999px; /* 设置拇指的圆角 */
+      }
+
       .noScrollBar {
         ::-webkit-scrollbar {
           display: none;
@@ -47,79 +70,89 @@
         if (e.data.type === 'updateViewer') {
           rootDom.innerHTML =
             e.data.viewInfo.fileContentsMap[e.data.viewInfo.entryFile];
-          await Promise.all(
-            e.data.viewInfo.externalFiles.map((externalFile) => {
-              return new Promise((resolve) => {
-                if (
-                  document.querySelector(`[src="${externalFile.filePath}"]`) ||
-                  document.querySelector(`[href="${externalFile.filePath}"]`)
-                ) {
-                  return resolve(1);
-                }
-                if (externalFile.fileName.endsWith('.js')) {
-                  const scriptDom = document.createElement('script');
-                  scriptDom.src = externalFile.filePath;
-                  document.head.append(scriptDom);
-                  scriptDom.onload = () => {
-                    resolve(1);
-                  };
-                  scriptDom.onerror = () => {
-                    resolve(1);
-                  };
-                }
-                if (externalFile.fileName.endsWith('.css')) {
-                  const linkDom = document.createElement('link');
-                  linkDom.rel = 'stylesheet';
-                  linkDom.href = externalFile.filePath;
-                  document.head.append(linkDom);
-                  linkDom.onload = () => {
-                    resolve(1);
-                  };
-                  linkDom.onerror = () => {
-                    resolve(1);
-                  };
-                }
-              });
-            }),
-          );
-          for (let i = 0; i < e.data.viewInfo.relevantPackages.length; i++) {
-            let relevantPackage = e.data.viewInfo.relevantPackages[i];
-            let fileContent = '';
-            if (e.data.viewInfo.fileContentsMap[relevantPackage]) {
-              fileContent = e.data.viewInfo.fileContentsMap[relevantPackage];
-            } else {
-              const res = await getFileContent({
-                id: e.data.viewInfo.id,
-                fileName: relevantPackage,
-              });
-              try {
+          try {
+            await Promise.all(
+              e.data.viewInfo.externalFiles.map((externalFile) => {
+                return new Promise((resolve) => {
+                  if (
+                    document.querySelector(
+                      `[src="${externalFile.filePath}"]`,
+                    ) ||
+                    document.querySelector(`[href="${externalFile.filePath}"]`)
+                  ) {
+                    return resolve(1);
+                  }
+                  if (externalFile.fileName.endsWith('.js')) {
+                    const scriptDom = document.createElement('script');
+                    scriptDom.src = externalFile.filePath;
+                    document.head.append(scriptDom);
+                    scriptDom.onload = () => {
+                      resolve(1);
+                    };
+                    scriptDom.onerror = () => {
+                      resolve(1);
+                    };
+                  }
+                  if (externalFile.fileName.endsWith('.css')) {
+                    const linkDom = document.createElement('link');
+                    linkDom.rel = 'stylesheet';
+                    linkDom.href = externalFile.filePath;
+                    document.head.append(linkDom);
+                    linkDom.onload = () => {
+                      resolve(1);
+                    };
+                    linkDom.onerror = () => {
+                      resolve(1);
+                    };
+                  }
+                });
+              }),
+            );
+            for (let i = 0; i < e.data.viewInfo.relevantPackages.length; i++) {
+              let relevantPackage = e.data.viewInfo.relevantPackages[i];
+              let fileContent = '';
+              if (e.data.viewInfo.fileContentsMap[relevantPackage]) {
+                fileContent = e.data.viewInfo.fileContentsMap[relevantPackage];
+              } else {
+                const res = await getFileContent({
+                  id: e.data.viewInfo.id,
+                  fileName: relevantPackage,
+                });
+
                 const resForJson = await res.json();
                 if (resForJson.code === 200) {
                   fileContent = resForJson.data.fileContent;
                 }
-              } catch (err) {
-                console.error(err);
+              }
+              if (relevantPackage.endsWith('.js')) {
+                const scriptDom = document.createElement('script');
+                scriptDom.innerHTML = fileContent;
+                document.body.append(scriptDom);
+              }
+              if (relevantPackage.endsWith('.css')) {
+                const styleDom = document.createElement('style');
+                styleDom.innerHTML = fileContent;
+                document.body.append(styleDom);
               }
             }
-            if (relevantPackage.endsWith('.js')) {
-              const scriptDom = document.createElement('script');
-              scriptDom.innerHTML = fileContent;
-              document.body.append(scriptDom);
-            }
-            if (relevantPackage.endsWith('.css')) {
-              const styleDom = document.createElement('style');
-              styleDom.innerHTML = fileContent;
-              document.body.append(styleDom);
-            }
+            window.parent.postMessage(
+              {
+                type: 'componentLoadCompleted',
+                data: '组件加载完成~',
+                id: soleId,
+              },
+              location.protocol + '//' + location.hostname + ':7777',
+            );
+          } catch (err) {
+            window.parent.postMessage(
+              {
+                type: 'handleCompileError',
+                data: err.message,
+                id: soleId,
+              },
+              location.protocol + '//' + location.hostname + ':7777',
+            );
           }
-          window.parent.postMessage(
-            {
-              type: 'componentLoadCompleted',
-              data: '组件加载完成~',
-              id: soleId,
-            },
-            location.protocol + '//' + location.hostname + ':7777',
-          );
         }
         if (e.data.type === 'setStyle') {
           Object.keys(e.data.style).map((selector) => {

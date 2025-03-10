@@ -107,15 +107,17 @@ export default function Viewer() {
   const safeResult = () => {
     try {
       return (
-        <div className="flex justify-center items-center w-[100vw] h-[100vh] bg-transparent">
+        <>
           {root ? (
-            <div key={randomKey}>
+            <div key={randomKey} className="bg-transparent">
               {(root as any)[Object.keys(root)[Object.keys(root).length - 1]]()}
             </div>
           ) : (
-            <NotFound></NotFound>
+            <div className="flex justify-center items-center absolute inset-0 bg-transparent">
+              <NotFound></NotFound>
+            </div>
           )}
-        </div>
+        </>
       );
     } catch (err: any) {
       console.log(err);
