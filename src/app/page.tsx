@@ -18,7 +18,15 @@ import {
   setBackgroundEffect,
 } from '@/store/background-effects/background-effects-slice';
 import { selectTheme, setTheme } from '@/store/theme/theme-slice';
-import { Sun, Moon, Plus, Palette } from 'lucide-react';
+import {
+  Sun,
+  Moon,
+  Plus,
+  Palette,
+  Search,
+  Dices,
+  ThumbsUp,
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -49,28 +57,6 @@ export default function MainPage() {
 
   const links = [
     {
-      title: 'Home',
-      icon: (
-        <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: '#',
-    },
-
-    {
-      title: 'Products',
-      icon: (
-        <IconTerminal2 className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: '#',
-    },
-    {
-      title: 'Components',
-      icon: (
-        <IconNewSection className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: '#',
-    },
-    {
       title: 'Blog',
       icon: (
         <img
@@ -84,6 +70,28 @@ export default function MainPage() {
         e.preventDefault();
         window.open('https://www.unstoppable840.cn', '_blank');
       },
+    },
+
+    {
+      title: 'Thumbs up',
+      icon: (
+        <ThumbsUp className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+      ),
+      href: '#',
+    },
+    {
+      title: 'Random',
+      icon: (
+        <Dices className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+      ),
+      href: '#',
+    },
+    {
+      title: 'Search',
+      icon: (
+        <Search className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+      ),
+      href: '#',
     },
     {
       title: 'Backgrounds',

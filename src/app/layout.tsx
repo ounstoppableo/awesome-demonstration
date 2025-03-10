@@ -29,6 +29,8 @@ export default function RootLayout({
       <head>
         <script src="/iconfont/iconfont.js"></script>
         <script src="/particles.js"></script>
+        <title>Awesome Demostration</title>
+        <link rel="icon" href="https://www.unstoppable840.cn/assets/favicon.ico" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
