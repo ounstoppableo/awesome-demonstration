@@ -53,6 +53,7 @@ export default function MainPage() {
   const [slideData, setSlideData] = useState([]);
   const theme = useAppSelector(selectTheme);
   const searchParams = useSearchParams();
+  const [dialogOpen, setDialogOpen] = useState(false);
   usePersistTheme();
 
   const links = [
@@ -220,7 +221,7 @@ export default function MainPage() {
     AddComponentForm,
     handleSubmitBtnClick,
     showLoadingForStepTwo,
-  } = useAddComponentForm();
+  } = useAddComponentForm({ setDialogOpen });
 
   return (
     <div className="h-[100vh] w-[100vw] overflow-hidden">
@@ -229,12 +230,12 @@ export default function MainPage() {
         <div className="w-full">
           <Carousel slides={slideData} />
         </div>
-        <div className="z-[48] flex items-center justify-center h-fit w-fit select-none pb-[2%]">
+        <div className="z-50 flex items-center justify-center h-fit w-fit select-none pb-[2%]">
           <FloatingDock mobileClassName="translate-y-20" items={links} />
         </div>
       </div>
       {auth ? (
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger>
             <div className="absolute left-2 h-10 w-10 z-40 text-neutral-600 dark:text-neutral-200 bottom-12 rounded-[2.5rem] hover:w-48 bg-neutral-200 dark:bg-neutral-800 transition-all duration-300 overflow-hidden">
               <div className="h-10 w-10 rounded-[9999px]  flex justify-center items-center">
@@ -243,7 +244,7 @@ export default function MainPage() {
               </div>
             </div>
           </DialogTrigger>
-          <DialogContent className="w-fit overflow-hidden">
+          <DialogContent className="w-fit">
             <DialogHeader>
               <DialogTitle>Add Component</DialogTitle>
               <DialogDescription>
@@ -252,6 +253,7 @@ export default function MainPage() {
             </DialogHeader>
             {AddComponentForm}
             <Loading
+              className={'rounded-lg'}
               showLoading={showLoadingForStepTwo}
               cubeSize={60}
             ></Loading>

@@ -56,8 +56,11 @@ import {
 import { formatDataToFormAdaptor } from '@/utils/dataFormat';
 import { Button } from '@/components/buttons/button-three';
 import Loading from '@/components/loading';
+import { setAlert, setAlertMsg } from '@/store/alert/alert-slice';
+import { useAppDispatch } from '@/store/hooks';
 
-export default function useAddComponentForm(props?: any) {
+export default function useAddComponentForm(props: any) {
+  const { setDialogOpen } = props;
   const onBeforeUpload = (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size / 1024 / 1024 > 10) {
@@ -72,6 +75,7 @@ export default function useAddComponentForm(props?: any) {
     setShowLoadingForStepOneSelectItems,
   ] = useState(false);
   const [showLoadingForStepTwo, setShowLoadingForStepTwo] = useState(false);
+  const dispatch = useAppDispatch();
 
   const form = useForm<ComponentInfoFormType>({
     resolver: zodResolver(formSchema),
@@ -117,7 +121,7 @@ export default function useAddComponentForm(props?: any) {
     }
   };
   const handleGetComponentInfo = () => {
-    if (form.getValues('addOrEdit') === 'add') return;
+    if (form.getValues('addOrEdit') === 'add') return form.reset();
     setShowLoadingForStepTwo(true);
     getComponentInfo({ id: form.getValues('editComponentId') as string }).then(
       (res) => {
@@ -138,11 +142,17 @@ export default function useAddComponentForm(props?: any) {
     handleFormSubmit(
       () => {
         setActiveStep(e);
+        if (e === 2) {
+          handleGetComponentInfo();
+        }
       },
       (params) => {
         if (activeStep > e) {
           form.clearErrors();
           return setActiveStep(e);
+        }
+        if (e === 2) {
+          handleGetComponentInfo();
         }
 
         if (params['editComponentId']) {
@@ -155,7 +165,6 @@ export default function useAddComponentForm(props?: any) {
           if (activeStep !== 2) {
             form.clearErrors();
           }
-          handleGetComponentInfo();
           return setActiveStep(2);
         }
       },
@@ -164,7 +173,12 @@ export default function useAddComponentForm(props?: any) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     addComponentInfo(values).then((res) => {
-      console.log(res);
+      if (res.code === 200) {
+        form.reset();
+        dispatch(setAlert({ value: true, type: 'success' }));
+        dispatch(setAlertMsg(res.msg));
+        setDialogOpen(false);
+      }
     });
   }
   const frameworkOptions: Option[] = [
@@ -253,6 +267,7 @@ export default function useAddComponentForm(props?: any) {
                           {showLoadingForStepOneSelectItems ? (
                             <div className="relative h-24 w-full">
                               <Loading
+                                className="rounded-sm"
                                 showLoading={showLoadingForStepOneSelectItems}
                                 cubeSize={30}
                               ></Loading>

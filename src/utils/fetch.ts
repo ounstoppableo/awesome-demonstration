@@ -44,7 +44,7 @@ class FetchInterceptor {
       const errorData = await response
         .json()
         .catch(() => ({ message: 'Request Error' }));
-      this._store?.dispatch(setAlert(true));
+      this._store?.dispatch(setAlert({ value: true, type: 'warning' }));
       this._store?.dispatch(setAlertMsg(errorData.message));
       throw new Error(
         errorData.message || `HTTP error! Status: ${response.status}`,
@@ -56,7 +56,7 @@ class FetchInterceptor {
         localStorage.setItem('token', '');
         window.history.replaceState({}, '', window.location.pathname);
       }
-      this._store?.dispatch(setAlert(true));
+      this._store?.dispatch(setAlert({ value: true, type: 'warning' }));
       this._store?.dispatch(setAlertMsg(res.msg));
     }
 
