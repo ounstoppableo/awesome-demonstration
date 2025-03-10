@@ -46,6 +46,12 @@ import Loading from '@/components/loading';
 import useAuth from '@/hooks/useAuth';
 import useAlert from '@/components/alert/useAlert';
 import usePersistTheme from '@/hooks/usePersistTheme';
+import {
+  ConfettiEmoji,
+  ConfettiFireworks,
+  ConfettiRef,
+  ConfettiStars,
+} from '@/components/confetti';
 
 export default function MainPage() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -54,6 +60,7 @@ export default function MainPage() {
   const theme = useAppSelector(selectTheme);
   const searchParams = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const confettiRef = useRef<ConfettiRef>(null);
   usePersistTheme();
 
   const links = [
@@ -79,6 +86,13 @@ export default function MainPage() {
         <ThumbsUp className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
       href: '#',
+      handleClick: (e: any) => {
+        Math.random() < 0.3
+          ? ConfettiFireworks()
+          : Math.random() < 0.6
+            ? ConfettiEmoji()
+            : ConfettiStars();
+      },
     },
     {
       title: 'Random',
