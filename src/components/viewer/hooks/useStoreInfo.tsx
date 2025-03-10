@@ -10,8 +10,9 @@ export default function useStoreInfo(props: any) {
   const componentInfo = useAppSelector(selectComponentInfo);
   const [frameworkReady, setFrameworkReady] = useState(false);
   const theme = useAppSelector(selectTheme);
-  const secondHandshakeId = uuidv4();
+
   useEffect(() => {
+    const secondHandshakeId = uuidv4();
     setFrameworkReady(false);
     const msgCb = (e: any) => {
       if (e.data.type === 'frameworkReady') {

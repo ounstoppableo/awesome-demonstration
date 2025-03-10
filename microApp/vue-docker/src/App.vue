@@ -35,16 +35,14 @@ onMounted(() => {
         );
         randomKey.value = Math.random();
         componentName.value = 'viewerRoot';
-        nextTick(() => {
-          window.parent.postMessage(
-            {
-              type: 'componentLoadCompleted',
-              data: '组件加载完成~',
-              id: soleId.value,
-            },
-            location.protocol + '//' + location.hostname + ':7777',
-          );
-        });
+        window.parent.postMessage(
+          {
+            type: 'componentLoadCompleted',
+            data: '组件加载完成~',
+            id: soleId.value,
+          },
+          location.protocol + '//' + location.hostname + ':7777',
+        );
       } catch (err: any) {
         window.parent.postMessage(
           { type: 'handleCompileError', data: err.message, id: soleId.value },

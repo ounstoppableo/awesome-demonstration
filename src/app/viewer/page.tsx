@@ -60,7 +60,7 @@ export default function Viewer() {
           {
             type: 'thirdHandShake',
             data: '二次握手成功~',
-            id: soleId,
+            id: soleId.current,
             secondHandshakeId: e.data.id,
           },
           location.protocol + '//' + location.hostname + ':7777',
