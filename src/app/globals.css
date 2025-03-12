@@ -187,3 +187,7 @@ body {
     background-position: 100% 50%;
   }
 }
+
+nextjs-portal {
+  display: none;
+}

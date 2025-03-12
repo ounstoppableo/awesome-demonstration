@@ -10,6 +10,7 @@ import { isEqual } from 'lodash';
 import ParseStringToComponent from '@/utils/parseStringToComponent/parseStringToComponent';
 import NotFound from '@/components/not-found';
 import { v4 as uuidv4 } from 'uuid';
+import ErrorBoundary from './errorBoundary';
 
 function useDeepCompareEffect(
   callback: (...params: any) => any,
@@ -29,6 +30,7 @@ export default function Viewer() {
   const componentInfo = useAppSelector(selectComponentInfo);
   const [randomKey, setRandomKey] = useState(Math.random());
   const soleId = useRef(uuidv4());
+  const errorBoundaryRef = useRef<any>(null);
   useEffect(() => {
     window.parent.postMessage(
       { type: 'frameworkReady', data: '我准备好了~', id: soleId.current },
@@ -91,6 +93,7 @@ export default function Viewer() {
           },
           location.origin,
         );
+        errorBoundaryRef.current?.resetError();
       } catch (err: any) {
         window.parent.postMessage(
           { type: 'handleCompileError', data: err.message, id: soleId.current },
@@ -107,7 +110,7 @@ export default function Viewer() {
   const safeResult = () => {
     try {
       return (
-        <>
+        <ErrorBoundary ref={errorBoundaryRef} soleId={soleId}>
           {root ? (
             <div key={randomKey} className="bg-transparent">
               {(root as any)[Object.keys(root)[Object.keys(root).length - 1]]()}
@@ -117,10 +120,9 @@ export default function Viewer() {
               <NotFound></NotFound>
             </div>
           )}
-        </>
+        </ErrorBoundary>
       );
     } catch (err: any) {
-      console.log(err);
       window.parent.postMessage(
         { type: 'handleCompileError', data: err.message, id: soleId.current },
         location.origin,
