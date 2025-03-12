@@ -1,7 +1,13 @@
 'use client';
 import useBackground from '@/hooks/useBackground';
 import { IconArrowNarrowRight } from '@tabler/icons-react';
-import { useState, useRef, useId, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useId,
+  useEffect,
+  useImperativeHandle,
+} from 'react';
 
 interface SlideData {
   title: string;
@@ -69,7 +75,7 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
   const { slot, button, title, handleClick } = slide;
 
   return (
-    <div className="[perspective:1200px] [transform-style:preserve-3d] select-none">
+    <div className="carouselItem [perspective:1200px] [transform-style:preserve-3d] select-none">
       <li
         ref={slideRef}
         className="group flex flex-1 flex-col items-center justify-center relative text-center text-white opacity-100 transition-all duration-300 ease-in-out w-[70vmin] h-[70vmin] mx-[4vmin] z-10"
@@ -165,65 +171,76 @@ const CarouselControl = ({
 
 interface CarouselProps {
   slides: SlideData[];
+  handleChange?: (...args: any) => any;
 }
 
-export function Carousel({ slides }: CarouselProps) {
-  const [current, setCurrent] = useState(0);
+export const Carousel = React.forwardRef<any, CarouselProps>(
+  ({ slides, handleChange }: CarouselProps, ref) => {
+    const [current, setCurrent] = useState(0);
 
-  const handlePreviousClick = () => {
-    const previous = current - 1;
-    setCurrent(previous < 0 ? slides.length - 1 : previous);
-  };
+    useImperativeHandle(ref, () => ({
+      current: () => current,
+    }));
 
-  const handleNextClick = () => {
-    const next = current + 1;
-    setCurrent(next === slides.length ? 0 : next);
-  };
+    const handlePreviousClick = () => {
+      const previous = current - 1;
+      setCurrent(previous < 0 ? slides.length - 1 : previous);
+    };
 
-  const handleSlideClick = (index: number) => {
-    if (current !== index) {
-      setCurrent(index);
-    }
-  };
+    const handleNextClick = () => {
+      const next = current + 1;
+      setCurrent(next === slides.length ? 0 : next);
+    };
 
-  const id = useId();
+    const handleSlideClick = (index: number) => {
+      if (current !== index) {
+        setCurrent(index);
+      }
+    };
 
-  return (
-    <>
-      <div
-        className="relative w-[70vmin] h-[70vmin] mx-auto z-10"
-        aria-labelledby={`carousel-heading-${id}`}
-      >
-        <ul
-          className="absolute flex mx-[-4vmin] transition-transform duration-1000 ease-in-out"
-          style={{
-            transform: `translateX(-${current * (100 / slides.length)}%)`,
-          }}
+    useEffect(() => {
+      handleChange && handleChange(current);
+    }, [current]);
+
+    const id = useId();
+
+    return (
+      <>
+        <div
+          className="relative w-[70vmin] h-[70vmin] mx-auto z-10"
+          aria-labelledby={`carousel-heading-${id}`}
         >
-          {slides.map((slide, index) => (
-            <Slide
-              key={index}
-              slide={slide}
-              index={index}
-              current={current}
-              handleSlideClick={handleSlideClick}
-            />
-          ))}
-        </ul>
-      </div>
-      <div className="absolute inset-0 flex justify-between items-center">
-        <CarouselControl
-          type="previous"
-          title="Go to previous slide"
-          handleClick={handlePreviousClick}
-        />
+          <ul
+            className="absolute flex mx-[-4vmin] transition-transform duration-1000 ease-in-out"
+            style={{
+              transform: `translateX(-${current * (100 / slides.length)}%)`,
+            }}
+          >
+            {slides.map((slide, index) => (
+              <Slide
+                key={index}
+                slide={slide}
+                index={index}
+                current={current}
+                handleSlideClick={handleSlideClick}
+              />
+            ))}
+          </ul>
+        </div>
+        <div className="absolute inset-0 flex justify-between items-center">
+          <CarouselControl
+            type="previous"
+            title="Go to previous slide"
+            handleClick={handlePreviousClick}
+          />
 
-        <CarouselControl
-          type="next"
-          title="Go to next slide"
-          handleClick={handleNextClick}
-        />
-      </div>
-    </>
-  );
-}
+          <CarouselControl
+            type="next"
+            title="Go to next slide"
+            handleClick={handleNextClick}
+          />
+        </div>
+      </>
+    );
+  },
+);

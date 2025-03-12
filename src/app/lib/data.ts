@@ -32,9 +32,14 @@ export const addComponentInfo = async (params: AddComponentInfo) => {
   });
 };
 
-type GetComponentList = {};
-export const getComponentList = async (params?: GetComponentList) => {
-  return await request(`/api/componentList`);
+type GetComponentList = {
+  page: number;
+  limit: number;
+};
+export const getComponentList = async (params: GetComponentList) => {
+  return await request(
+    `/api/componentList?page=${params.page}&limit=${params.limit}`,
+  );
 };
 
 type ParseCssToObject = {
@@ -50,6 +55,20 @@ export const parseCssToObject = async (params: ParseCssToObject) => {
 type Auth = {};
 export const auth = async (params?: Auth) => {
   return await request(`/api/auth`, {
+    method: 'GET',
+  });
+};
+
+type RandomComponent = {};
+export const randomComponent = async (params?: RandomComponent) => {
+  return await request(`/api/randomComponent`, {
+    method: 'GET',
+  });
+};
+
+type SearchComponent = { componentName: string };
+export const searchComponent = async (params?: SearchComponent) => {
+  return await request(`/api/searchComponent`, {
     method: 'GET',
   });
 };

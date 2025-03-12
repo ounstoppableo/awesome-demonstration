@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
       const endIndex = page * limit;
       try {
         const [rows, fields] = await pool.query(
-          'select * from componentInfo where `index`>=? and `index`<=?',
+          'select * from componentInfo where `index`>? and `index`<=?',
           [startIndex, endIndex],
         );
         const result = (rows as any[]).map((item: componentInfo) => ({
@@ -38,10 +38,7 @@ export async function GET(req: NextRequest) {
             ? JSON.parse(item.reactRelevantFiles)
             : null,
         }));
-        handleCompleted({
-          msg: '查询成功!',
-          data: result,
-        });
+        handleCompleted({ msg: '查询成功!', data: result });
       } catch (err) {
         console.error(err);
         handleError(ResponseMsg.serverError);

@@ -1,12 +1,5 @@
 'use client';
-import {
-  IconBrandGithub,
-  IconBrandX,
-  IconExchange,
-  IconHome,
-  IconNewSection,
-  IconTerminal2,
-} from '@tabler/icons-react';
+import { IconBrandGithub } from '@tabler/icons-react';
 import { Carousel } from '@/components/carousel/carousel';
 import { FloatingDock } from '@/components/floating-dock/floating-dock';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -52,6 +45,7 @@ import {
   ConfettiRef,
   ConfettiStars,
 } from '@/components/confetti';
+import useGetComponentLimitCount from './hooks/useGetComponentLimitCount';
 
 export default function MainPage() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,7 +54,12 @@ export default function MainPage() {
   const theme = useAppSelector(selectTheme);
   const searchParams = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const confettiRef = useRef<ConfettiRef>(null);
+  const [shouldAddpage, setshouldAddpage] = useState(1);
+  const { limit } = useGetComponentLimitCount({});
+  const carouselRef = useRef<any>(null);
+  const [componetListRaw, setComponentListRaw] = useState<any>({});
+  const [componentList, setComponentList] = useState<any>([]);
+  const [curretnCarusalIndex, setCurrentCarusalIndex] = useState(0);
   usePersistTheme();
 
   const links = [
@@ -158,6 +157,74 @@ export default function MainPage() {
 
   const currentBackgroundEffect = useAppSelector(selectBackgroundEffects);
   const dispatch = useAppDispatch();
+
+  const handleSetComponentList = () => {
+    setLoading(true);
+    getComponentList({ page: shouldAddpage, limit }).then(async (res: any) => {
+      if (res.code === 200) {
+        setComponentListRaw({ ...componetListRaw, [shouldAddpage]: res.data });
+      }
+      setLoading(false);
+    });
+  };
+
+  const handleGenerateCarusalData = async () => {
+    const slideData: any = await Promise.all(
+      componentList.map(async (item: any, index: any) => {
+        const componentInfoForViewer = formatDataToViewerAdaptor(
+          item,
+          item.framework[0],
+        );
+        const res = await getFileContent({
+          id: componentInfoForViewer.id,
+          fileName: componentInfoForViewer.entryFile,
+        });
+        if (res.code === 200) {
+          componentInfoForViewer.fileContentsMap[
+            componentInfoForViewer.entryFile
+          ] = res.data.fileContent;
+        } else {
+          componentInfoForViewer.fileContentsMap[
+            componentInfoForViewer.entryFile
+          ] = '';
+        }
+
+        const showRange = Math.ceil(limit / 2) - 1;
+
+        return {
+          title: item.name,
+          button: 'Explore Component',
+          handleClick: (e: any) => {
+            router.push(`/editor?id=${item.id}`);
+          },
+          slot:
+            curretnCarusalIndex <= index + showRange &&
+            curretnCarusalIndex >= index - showRange ? (
+              <Viewer
+                key={index}
+                componentInfoForParent={componentInfoForViewer}
+              ></Viewer>
+            ) : (
+              <></>
+            ),
+        };
+      }),
+    );
+    setSlideData(slideData);
+  };
+
+  useEffect(() => {
+    setComponentList(
+      [
+        ...new Map(
+          Object.values(componetListRaw)
+            .flat()
+            .map((component: any) => [component.index, component]),
+        ).values(),
+      ].sort((a: any, b: any) => +a.index - +b.index),
+    );
+  }, [componetListRaw]);
+
   useEffect(() => {
     currentBackgroundEffect &&
       backgroundEffectMap[currentBackgroundEffect].setBackground();
@@ -176,48 +243,27 @@ export default function MainPage() {
   }, [theme]);
 
   useEffect(() => {
-    getComponentList().then(async (res) => {
-      if (res.code === 200) {
-        const slideData: any = await Promise.all(
-          res.data.map(async (item: any, index: any) => {
-            const componentInfoForViewer = formatDataToViewerAdaptor(
-              item,
-              item.framework[0],
-            );
-            const res = await getFileContent({
-              id: componentInfoForViewer.id,
-              fileName: componentInfoForViewer.entryFile,
-            });
-            if (res.code === 200) {
-              componentInfoForViewer.fileContentsMap[
-                componentInfoForViewer.entryFile
-              ] = res.data.fileContent;
-            } else {
-              componentInfoForViewer.fileContentsMap[
-                componentInfoForViewer.entryFile
-              ] = '';
-            }
+    handleSetComponentList();
+  }, [limit, shouldAddpage]);
 
-            return {
-              title: item.name,
-              button: 'Explore Component',
-              handleClick: (e: any) => {
-                router.push(`/editor?id=${item.id}`);
-              },
-              slot: (
-                <Viewer
-                  key={index}
-                  componentInfoForParent={componentInfoForViewer}
-                ></Viewer>
-              ),
-            };
-          }),
-        );
-        setSlideData(slideData);
-      }
-      setLoading(false);
-    });
-  }, []);
+  useEffect(() => {
+    const currentPage = Math.floor(curretnCarusalIndex / limit) + 1;
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = currentPage * limit - 1;
+    if (curretnCarusalIndex >= endIndex - Math.floor(limit / 4)) {
+      setshouldAddpage(currentPage + 1);
+      return;
+    }
+    if (curretnCarusalIndex <= startIndex + Math.floor(limit / 4)) {
+      setshouldAddpage(currentPage === 1 ? 1 : currentPage - 1);
+      return;
+    }
+    setshouldAddpage(currentPage);
+  }, [curretnCarusalIndex, limit]);
+
+  useEffect(() => {
+    handleGenerateCarusalData();
+  }, [componentList, limit, curretnCarusalIndex]);
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -242,7 +288,11 @@ export default function MainPage() {
       {alertVDom}
       <div className="flex flex-col items-center justify-end gap-[6%] absolute inset-0 overflow-hidden">
         <div className="w-full">
-          <Carousel slides={slideData} />
+          <Carousel
+            handleChange={setCurrentCarusalIndex}
+            ref={carouselRef}
+            slides={slideData}
+          />
         </div>
         <div className="z-50 flex items-center justify-center h-fit w-fit select-none pb-[2%]">
           <FloatingDock mobileClassName="translate-y-20" items={links} />

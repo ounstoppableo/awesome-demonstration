@@ -38,10 +38,7 @@ export async function GET(req: NextRequest) {
             ? JSON.parse(item.reactRelevantFiles)
             : null,
         }));
-        handleCompleted({
-          msg: '查询成功!',
-          data: result,
-        });
+        handleCompleted({ msg: '查询成功!', data: result });
       } catch (err) {
         console.error(err);
         handleError(ResponseMsg.serverError);
