@@ -66,9 +66,12 @@ export const randomComponent = async (params?: RandomComponent) => {
   });
 };
 
-type SearchComponent = { componentName: string };
-export const searchComponent = async (params?: SearchComponent) => {
-  return await request(`/api/searchComponent`, {
-    method: 'GET',
-  });
+type SearchComponent = { componentName: string; limit: number };
+export const searchComponentResPage = async (params?: SearchComponent) => {
+  return await request(
+    `/api/searchComponent/resPage?componentName=${params?.componentName}&limit=${params?.limit}`,
+    {
+      method: 'GET',
+    },
+  );
 };

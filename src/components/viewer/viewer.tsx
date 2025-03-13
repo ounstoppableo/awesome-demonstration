@@ -74,28 +74,49 @@ export default function Viewer(props: {
     };
   }, []);
 
-  const handleOnMessage = (e: any) => {
-    if (e.data.id !== soleId.current) return;
-    if (e.data.type === 'componentLoadCompleted') {
-      setShowErrorAlert(false);
-      setErrorInfo({
-        title: 'Some Errors Happened',
-        content: '',
-      });
-    }
-    if (e.data.type === 'handleCompileError') {
-      setShowErrorAlert(true);
-      setErrorInfo({
-        title: 'Some Errors Happened',
-        content: e.data.data,
-      });
-    }
-  };
-
   useEffect(() => {
+    const handleOnMessage = (e: any) => {
+      if (e.data.id !== soleId.current) return;
+      if (e.data.type === 'componentLoadCompleted') {
+        setShowErrorAlert(false);
+        setErrorInfo({
+          title: 'Some Errors Happened',
+          content: '',
+        });
+      }
+      if (e.data.type === 'handleCompileError') {
+        setShowErrorAlert(true);
+        setErrorInfo({
+          title: 'Some Errors Happened',
+          content: e.data.data,
+        });
+      }
+    };
     window.addEventListener('message', handleOnMessage);
     return () => {
       window.removeEventListener('message', handleOnMessage);
+    };
+  }, []);
+
+  function destroyIframe(iframe: any) {
+    if (!iframe) return;
+
+    try {
+      if (iframe.contentWindow) {
+        iframe.contentWindow.document.open();
+        iframe.contentWindow.document.write('');
+        iframe.contentWindow.document.close();
+      }
+    } catch (e) {}
+
+    iframe.src = 'about:blank';
+
+    iframe.remove();
+  }
+
+  useEffect(() => {
+    return () => {
+      destroyIframe(iframeRef.current);
     };
   }, []);
 

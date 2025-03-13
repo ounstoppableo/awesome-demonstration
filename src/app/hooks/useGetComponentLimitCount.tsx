@@ -11,7 +11,7 @@ export default function useGetComponentLimitCount(props: any) {
         const componentWidth = (document.querySelector('.carouselItem') as any)
           ?.offsetWidth;
         if (componentWidth) {
-          setLimit(Math.floor(window.innerWidth / componentWidth));
+          setLimit(Math.floor(window.innerWidth / componentWidth) * 2);
         }
         _timer.current = null;
       }, 500);

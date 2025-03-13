@@ -172,12 +172,22 @@ const CarouselControl = ({
 interface CarouselProps {
   slides: SlideData[];
   handleChange?: (...args: any) => any;
+  animate?: boolean;
+  current: number;
+  setCurrent: any;
 }
 
 export const Carousel = React.forwardRef<any, CarouselProps>(
-  ({ slides, handleChange }: CarouselProps, ref) => {
-    const [current, setCurrent] = useState(0);
-
+  (
+    {
+      slides,
+      handleChange,
+      animate = true,
+      current,
+      setCurrent,
+    }: CarouselProps,
+    ref,
+  ) => {
     useImperativeHandle(ref, () => ({
       current: () => current,
     }));
@@ -198,10 +208,6 @@ export const Carousel = React.forwardRef<any, CarouselProps>(
       }
     };
 
-    useEffect(() => {
-      handleChange && handleChange(current);
-    }, [current]);
-
     const id = useId();
 
     return (
@@ -211,7 +217,10 @@ export const Carousel = React.forwardRef<any, CarouselProps>(
           aria-labelledby={`carousel-heading-${id}`}
         >
           <ul
-            className="absolute flex mx-[-4vmin] transition-transform duration-1000 ease-in-out"
+            className={
+              'absolute flex mx-[-4vmin] ' +
+              (animate ? 'transition-transform duration-1000 ease-in-out' : '')
+            }
             style={{
               transform: `translateX(-${current * (100 / slides.length)}%)`,
             }}

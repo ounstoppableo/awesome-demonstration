@@ -15,14 +15,20 @@ import {
   useTransform,
 } from 'framer-motion';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const FloatingDock = ({
   items,
   desktopClassName,
   mobileClassName,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: {
+    title: string;
+    icon: React.ReactNode;
+    href: string;
+    popover?: any;
+    popCb?: any;
+  }[];
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
@@ -38,7 +44,13 @@ const FloatingDockMobile = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: {
+    title: string;
+    icon: React.ReactNode;
+    href: string;
+    popover?: any;
+    popCb?: any;
+  }[];
   className?: string;
 }) => {
   const [open, setOpen] = useState(false);
@@ -93,7 +105,13 @@ const FloatingDockDesktop = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: {
+    title: string;
+    icon: React.ReactNode;
+    href: string;
+    popover?: any;
+    popCb?: any;
+  }[];
   className?: string;
 }) => {
   let mouseX = useMotionValue(Infinity);
@@ -118,12 +136,16 @@ function IconContainer({
   title,
   icon,
   href,
+  popover,
+  popCb,
   handleClick,
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
   href: string;
+  popover?: any;
+  popCb?: any;
   handleClick?: (e?: any) => any;
 }) {
   let ref = useRef<HTMLDivElement>(null);
@@ -168,6 +190,9 @@ function IconContainer({
 
   const [hovered, setHovered] = useState(false);
 
+  useEffect(() => {
+    popCb && popCb();
+  }, [hovered]);
   return (
     <Link href={href}>
       <motion.div
@@ -186,14 +211,22 @@ function IconContainer({
               exit={{ opacity: 0, y: 2, x: '-50%' }}
               className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
             >
-              {title}
+              {popover ? '' : title}
             </motion.div>
           )}
         </AnimatePresence>
         <motion.div
           style={{ width: widthIcon, height: heightIcon }}
-          className="flex items-center justify-center"
+          className="flex items-center justify-center relative"
         >
+          <motion.div
+            initial={{ opacity: 0, y: '-50%' }}
+            animate={{ opacity: 1, y: '-100%' }}
+            exit={{ opacity: 0, y: '-50%' }}
+            className="absolute w-fit -top-8"
+          >
+            {hovered && popover}
+          </motion.div>
           {icon}
         </motion.div>
       </motion.div>

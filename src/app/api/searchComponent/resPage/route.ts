@@ -7,11 +7,24 @@ export async function GET(req: NextRequest) {
     req,
     async (req, handleCompleted, handleError) => {
       const searchParams = req.nextUrl.searchParams;
-      const page = +(searchParams.get('page') || 1);
+      const componentName = searchParams.get('componentName') as string;
       const limit: number = +(searchParams.get('limit') || 2);
-      const startIndex = (page - 1) * limit + 1;
-      const endIndex = page * limit;
+      const searchRegexp = componentName.split('').join('.*');
       try {
+        const [rowsTemp, fieldsTemp] = await pool.query(
+          'select * from componentInfo where name REGEXP ? limit 1',
+          [searchRegexp],
+        );
+        if (!rowsTemp || (rowsTemp as any).length === 0) {
+          return handleCompleted({
+            msg: '查询成功!',
+            data: { result: [], index: null, page: null },
+          });
+        }
+        const target = (rowsTemp as any[])[0];
+        const page = Math.floor((target.index - 1) / limit) + 1;
+        const startIndex = (page - 1) * limit + 1;
+        const endIndex = page * limit;
         const [rows, fields] = await pool.query(
           'select * from componentInfo where `index`>=? and `index`<=?',
           [startIndex, endIndex],
@@ -38,7 +51,10 @@ export async function GET(req: NextRequest) {
             ? JSON.parse(item.reactRelevantFiles)
             : null,
         }));
-        handleCompleted({ msg: '查询成功!', data: result });
+        handleCompleted({
+          msg: '查询成功!',
+          data: { pageList: result, index: target.index, page },
+        });
       } catch (err) {
         console.error(err);
         handleError(ResponseMsg.serverError);
