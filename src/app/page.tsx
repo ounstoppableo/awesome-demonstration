@@ -57,10 +57,12 @@ export default function MainPage() {
   usePersistTheme();
 
   const {
+    setRandom,
     carousel,
     handleSearch,
     searchComponentName,
     setSearchComponentName,
+    handleRandom,
   } = usePageCarouselLogic({
     setLoading,
     router,
@@ -114,6 +116,9 @@ export default function MainPage() {
         <Dices className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
       href: '#',
+      handleClick: (e: any) => {
+        handleRandom();
+      },
     },
     {
       title: 'Search',
@@ -144,6 +149,7 @@ export default function MainPage() {
       },
       handleClick: () => {
         (inputRef.current as any)?.focus();
+        setRandom(false);
       },
       href: '#',
     },

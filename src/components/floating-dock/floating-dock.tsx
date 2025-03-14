@@ -188,11 +188,19 @@ function IconContainer({
     damping: 12,
   });
 
+  const [showPop, setShowPop] = useState(false);
+
+  const _handleClick = (e: any) => {
+    setShowPop(true);
+    handleClick && handleClick(e);
+  };
+
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    popCb && popCb();
-  }, [hovered]);
+    hovered || setShowPop(false);
+    hovered && showPop && popCb && popCb();
+  }, [hovered, showPop]);
   return (
     <Link href={href}>
       <motion.div
@@ -201,7 +209,7 @@ function IconContainer({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative"
-        onClick={handleClick}
+        onClick={_handleClick}
       >
         <AnimatePresence>
           {hovered && (
@@ -211,7 +219,7 @@ function IconContainer({
               exit={{ opacity: 0, y: 2, x: '-50%' }}
               className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
             >
-              {popover ? '' : title}
+              {showPop && popover ? '' : title}
             </motion.div>
           )}
         </AnimatePresence>
@@ -225,7 +233,7 @@ function IconContainer({
             exit={{ opacity: 0, y: '-50%' }}
             className="absolute w-fit -top-8"
           >
-            {hovered && popover}
+            {showPop && hovered && popover}
           </motion.div>
           {icon}
         </motion.div>

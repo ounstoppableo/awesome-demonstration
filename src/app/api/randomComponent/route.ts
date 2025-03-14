@@ -6,15 +6,9 @@ export async function GET(req: NextRequest) {
   return await handleResponse(
     req,
     async (req, handleCompleted, handleError) => {
-      const searchParams = req.nextUrl.searchParams;
-      const page = +(searchParams.get('page') || 1);
-      const limit: number = +(searchParams.get('limit') || 2);
-      const startIndex = (page - 1) * limit + 1;
-      const endIndex = page * limit;
       try {
         const [rows, fields] = await pool.query(
-          'select * from componentInfo where `index`>? and `index`<=?',
-          [startIndex, endIndex],
+          'SELECT * FROM componentInfo ORDER BY RAND() LIMIT 10;',
         );
         const result = (rows as any[]).map((item: componentInfo) => ({
           ...item,

@@ -106,6 +106,7 @@ export default function Viewer(props: {
         iframe.contentWindow.document.open();
         iframe.contentWindow.document.write('');
         iframe.contentWindow.document.close();
+        iframe.contentWindow = null;
       }
     } catch (e) {}
 

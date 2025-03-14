@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import {
   getComponentList,
   getFileContent,
+  randomComponent,
   searchComponentResPage,
 } from '../lib/data';
 import { formatDataToViewerAdaptor } from '@/utils/dataFormat';
@@ -22,6 +23,8 @@ export default function usePageCarouselLogic(props: any) {
   const [carouselAnimate, setCarouselAnimate] = useState(true);
   const { limit } = useGetComponentLimitCount({});
   const [searchResIndex, setSearchResIndex] = useState<any>(null);
+  const [random, setRandom] = useState(false);
+  const [randomList, setRandomList] = useState([]);
 
   const handleSetComponentList = () => {
     if (
@@ -71,7 +74,7 @@ export default function usePageCarouselLogic(props: any) {
             currentCarusalIndex <= index + showRange &&
             currentCarusalIndex >= index - showRange ? (
               <Viewer
-                key={index}
+                key={item.index}
                 componentInfoForParent={componentInfoForViewer}
               ></Viewer>
             ) : (
@@ -83,27 +86,34 @@ export default function usePageCarouselLogic(props: any) {
     setSlideData(slideData);
   };
 
+  const setComponentListFromRaw = () => {
+    setComponentList(
+      random
+        ? randomList
+        : [
+            ...new Map(
+              Object.values(componetListRaw)
+                .flat()
+                .map((component: any) => [component.index, component]),
+            ).values(),
+          ].sort((a: any, b: any) => +a.index - +b.index),
+    );
+  };
+
   useEffect(() => {
     handleSetComponentList();
   }, [limit, shouldAddpage]);
 
   useEffect(() => {
-    setComponentList(
-      [
-        ...new Map(
-          Object.values(componetListRaw)
-            .flat()
-            .map((component: any) => [component.index, component]),
-        ).values(),
-      ].sort((a: any, b: any) => +a.index - +b.index),
-    );
-  }, [componetListRaw]);
+    setComponentListFromRaw();
+  }, [componetListRaw, random, randomList]);
 
   useEffect(() => {
     handleGenerateCarusalData();
   }, [componentList, limit, currentCarusalIndex]);
 
   useEffect(() => {
+    if (random) return;
     if (!componentList || componentList.length === 0) return;
     const currentPage =
       Math.floor((componentList[currentCarusalIndex].index - 1) / limit) + 1;
@@ -118,12 +128,12 @@ export default function usePageCarouselLogic(props: any) {
       return;
     }
     setshouldAddpage(currentPage);
-  }, [currentCarusalIndex, limit]);
+  }, [currentCarusalIndex, limit, random]);
 
   useEffect(() => {
     setLoading(false);
     setCarouselAnimate(true);
-  }, [slideData.length]);
+  }, [slideData]);
 
   const carousel = (
     <Carousel
@@ -143,6 +153,8 @@ export default function usePageCarouselLogic(props: any) {
       (e.type !== 'click' && e.type !== 'keyup')
     )
       return;
+    if (!searchComponentName) return;
+    setLoading(true);
     searchComponentResPage({ componentName: searchComponentName, limit }).then(
       (res) => {
         if (res.code === 200 && res.data.page && res.data.index) {
@@ -157,6 +169,17 @@ export default function usePageCarouselLogic(props: any) {
     );
   };
 
+  const handleRandom = () => {
+    randomComponent().then((res) => {
+      if (res.code === 200) {
+        setRandomList(res.data);
+        setLoading(true);
+        setRandom(true);
+        setCurrentCarusalIndex(0);
+      }
+    });
+  };
+
   useEffect(() => {
     if (searchResIndex) {
       const index = componentList.findIndex(
@@ -164,11 +187,21 @@ export default function usePageCarouselLogic(props: any) {
       );
       index >= 0 && setCurrentCarusalIndex(index);
     }
-  }, [searchResIndex, slideData.length]);
+  }, [searchResIndex, slideData]);
+
+  useEffect(() => {
+    if (!random) {
+      setComponentListFromRaw();
+      setCurrentCarusalIndex(0);
+    }
+  }, [random]);
+  
   return {
     carousel,
     handleSearch,
     searchComponentName,
     setSearchComponentName,
+    handleRandom,
+    setRandom,
   };
 }
