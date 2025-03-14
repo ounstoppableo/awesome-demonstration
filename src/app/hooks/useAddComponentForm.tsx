@@ -47,6 +47,7 @@ import {
   getComponentInfo,
   getComponentList,
   packageParse,
+  swiftGetList,
 } from '../lib/data';
 import { Component, Minus, Pencil, Plus } from 'lucide-react';
 import {
@@ -191,7 +192,7 @@ export default function useAddComponentForm(props: any) {
   useEffect(() => {
     if (addOrEdit === 'edit') {
       setShowLoadingForStepOneSelectItems(true);
-      getComponentList().then((res) => {
+      swiftGetList().then((res) => {
         if (res.code === 200) {
           setComponentList(res.data);
         }

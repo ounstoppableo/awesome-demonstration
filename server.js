@@ -10,13 +10,21 @@ app.prepare().then(async () => {
   const pool = require('./src/lib/db.js');
   const redisClient = require('./src/lib/redis.js');
   const [rows, fields] = await pool.query(
-    'select name,`index` from componentInfo',
+    'select name,`index`,id from componentInfo',
   );
+  await (await redisClient).del('componentNameMapIndex');
+  await (await redisClient).del('componentNameMapId');
   await (
     await redisClient
   ).lPush(
     'componentNameMapIndex',
     rows.map((row) => row.name + ':' + row.index),
+  );
+  await (
+    await redisClient
+  ).lPush(
+    'componentNameMapId',
+    rows.map((row) => row.name + ':' + row.id),
   );
   https
     .createServer(

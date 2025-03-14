@@ -80,3 +80,9 @@ export const searchComponentResPage = async (params?: SearchComponent) => {
     },
   );
 };
+
+export const swiftGetList = async () => {
+  return await request(`/api/swiftGetList`, {
+    method: 'GET',
+  });
+};

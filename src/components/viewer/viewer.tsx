@@ -116,8 +116,9 @@ export default function Viewer(props: {
   }
 
   useEffect(() => {
+    const iframe = iframeRef.current;
     return () => {
-      destroyIframe(iframeRef.current);
+      destroyIframe(iframe);
     };
   }, []);
 
