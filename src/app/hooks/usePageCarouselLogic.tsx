@@ -36,7 +36,15 @@ export default function usePageCarouselLogic(props: any) {
     setCarouselAnimate(false);
     getComponentList({ page: shouldAddpage, limit }).then(async (res: any) => {
       if (res.code === 200) {
-        setComponentListRaw({ ...componetListRaw, [shouldAddpage]: res.data });
+        if (!res.data || res.data.length === 0) {
+          setCarouselAnimate(true);
+          setLoading(false);
+          return;
+        }
+        setComponentListRaw({
+          ...componetListRaw,
+          [shouldAddpage]: res.data,
+        });
       }
     });
   };
@@ -133,7 +141,7 @@ export default function usePageCarouselLogic(props: any) {
   useEffect(() => {
     setLoading(false);
     setCarouselAnimate(true);
-  }, [slideData]);
+  }, [slideData.length]);
 
   const carousel = (
     <Carousel
@@ -158,24 +166,34 @@ export default function usePageCarouselLogic(props: any) {
     searchComponentResPage({ componentName: searchComponentName, limit }).then(
       (res) => {
         if (res.code === 200 && res.data.page && res.data.index) {
-          setComponentListRaw({
-            ...componetListRaw,
-            [res.data.page]: res.data.pageList,
-          });
-          setSearchResIndex(res.data.index);
-          setSearchComponentName('');
+          if (
+            componetListRaw[res.data.page] &&
+            componetListRaw[res.data.page].length === limit
+          ) {
+            setLoading(false);
+          } else {
+            setComponentListRaw({
+              ...componetListRaw,
+              [res.data.page]: res.data.pageList,
+            });
+          }
+        } else {
+          setLoading(false);
         }
+        setSearchResIndex(res.data.index);
+        setSearchComponentName('');
       },
     );
   };
 
   const handleRandom = () => {
+    setLoading(true);
+    setRandom(true);
+    setCurrentCarusalIndex(0);
     randomComponent().then((res) => {
       if (res.code === 200) {
         setRandomList(res.data);
-        setLoading(true);
-        setRandom(true);
-        setCurrentCarusalIndex(0);
+        setLoading(false);
       }
     });
   };
@@ -195,7 +213,7 @@ export default function usePageCarouselLogic(props: any) {
       setCurrentCarusalIndex(0);
     }
   }, [random]);
-  
+
   return {
     carousel,
     handleSearch,

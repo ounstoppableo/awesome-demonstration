@@ -16,7 +16,7 @@ export default function useStoreInfo(props: any) {
     setFrameworkReady(false);
     const msgCb = (e: any) => {
       if (e.data.type === 'frameworkReady') {
-        iframeRef.current?.contentWindow.postMessage(
+        iframeRef.current?.contentWindow?.postMessage(
           {
             type: 'secondHandshake',
             id: secondHandshakeId,
@@ -45,11 +45,11 @@ export default function useStoreInfo(props: any) {
         type: 'updateViewer',
         viewInfo: componentInfo,
       };
-      iframeRef.current?.contentWindow.postMessage(
+      iframeRef.current?.contentWindow?.postMessage(
         messageData,
         getServerAddr(componentInfo.currentFramework),
       );
-      iframeRef.current?.contentWindow.postMessage(
+      iframeRef.current?.contentWindow?.postMessage(
         {
           type: 'setStyle',
           style: {
@@ -67,7 +67,7 @@ export default function useStoreInfo(props: any) {
   ]);
 
   useEffect(() => {
-    iframeRef.current?.contentWindow.postMessage(
+    iframeRef.current?.contentWindow?.postMessage(
       {
         type: 'setStyle',
         style: {

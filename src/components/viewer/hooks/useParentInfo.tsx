@@ -19,7 +19,7 @@ export default function useParentInfo(props: any) {
     setFrameworkReady(false);
     const msgCb = (e: any) => {
       if (e.data.type === 'frameworkReady') {
-        iframeRef.current?.contentWindow.postMessage(
+        iframeRef.current?.contentWindow?.postMessage(
           {
             type: 'secondHandshake',
             id: secondHandshakeId,
@@ -48,11 +48,11 @@ export default function useParentInfo(props: any) {
         type: 'updateViewer',
         viewInfo: componentInfoForParent,
       };
-      iframeRef.current?.contentWindow.postMessage(
+      iframeRef.current?.contentWindow?.postMessage(
         messageData,
         getServerAddr(componentInfoForParent.currentFramework),
       );
-      iframeRef.current?.contentWindow.postMessage(
+      iframeRef.current?.contentWindow?.postMessage(
         {
           type: 'setStyle',
           style: {
@@ -63,7 +63,7 @@ export default function useParentInfo(props: any) {
         },
         getServerAddr(componentInfoForParent.currentFramework),
       );
-      iframeRef.current?.contentWindow.postMessage(
+      iframeRef.current?.contentWindow?.postMessage(
         {
           type: 'setNoScrollBar',
         },
@@ -73,7 +73,7 @@ export default function useParentInfo(props: any) {
   }, [frameworkReady]);
 
   useEffect(() => {
-    iframeRef.current?.contentWindow.postMessage(
+    iframeRef.current?.contentWindow?.postMessage(
       {
         type: 'setStyle',
         style: {
