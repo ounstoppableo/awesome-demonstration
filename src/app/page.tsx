@@ -67,6 +67,16 @@ export default function MainPage() {
   });
 
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    const _cb = () => {
+      if (inputRef.current) (inputRef.current as any).focus();
+    };
+    window.addEventListener('keyup', _cb);
+    return () => {
+      window.removeEventListener('keyup', _cb);
+    };
+  }, []);
   const links = [
     {
       title: 'Blog',

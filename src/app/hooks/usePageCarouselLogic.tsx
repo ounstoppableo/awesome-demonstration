@@ -132,6 +132,7 @@ export default function usePageCarouselLogic(props: any) {
       animate={carouselAnimate}
       current={currentCarusalIndex}
       setCurrent={setCurrentCarusalIndex}
+      handleClick={() => setSearchResIndex(null)}
     />
   );
 
@@ -150,6 +151,7 @@ export default function usePageCarouselLogic(props: any) {
             [res.data.page]: res.data.pageList,
           });
           setSearchResIndex(res.data.index);
+          setSearchComponentName('');
         }
       },
     );
@@ -161,7 +163,6 @@ export default function usePageCarouselLogic(props: any) {
         (component: any) => component.index === searchResIndex,
       );
       index >= 0 && setCurrentCarusalIndex(index);
-      index >= 0 && setSearchResIndex(null);
     }
   }, [searchResIndex, slideData.length]);
   return {

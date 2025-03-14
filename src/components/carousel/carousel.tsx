@@ -175,6 +175,7 @@ interface CarouselProps {
   animate?: boolean;
   current: number;
   setCurrent: any;
+  handleClick?: (...args: any) => any;
 }
 
 export const Carousel = React.forwardRef<any, CarouselProps>(
@@ -185,6 +186,7 @@ export const Carousel = React.forwardRef<any, CarouselProps>(
       animate = true,
       current,
       setCurrent,
+      handleClick,
     }: CarouselProps,
     ref,
   ) => {
@@ -195,16 +197,19 @@ export const Carousel = React.forwardRef<any, CarouselProps>(
     const handlePreviousClick = () => {
       const previous = current - 1;
       setCurrent(previous < 0 ? slides.length - 1 : previous);
+      handleClick && handleClick();
     };
 
     const handleNextClick = () => {
       const next = current + 1;
       setCurrent(next === slides.length ? 0 : next);
+      handleClick && handleClick();
     };
 
     const handleSlideClick = (index: number) => {
       if (current !== index) {
         setCurrent(index);
+        handleClick && handleClick();
       }
     };
 

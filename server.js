@@ -6,7 +6,18 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
+  const pool = require('./src/lib/db.js');
+  const redisClient = require('./src/lib/redis.js');
+  const [rows, fields] = await pool.query(
+    'select name,`index` from componentInfo',
+  );
+  await (
+    await redisClient
+  ).lPush(
+    'componentNameMapIndex',
+    rows.map((row) => row.name + ':' + row.index),
+  );
   https
     .createServer(
       {

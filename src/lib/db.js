@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+const mysql = require('mysql2/promise');
 
 // 连接池配置
 const pool = mysql.createPool({
@@ -12,4 +12,4 @@ const pool = mysql.createPool({
 });
 
 // 导出连接池
-export default pool;
+module.exports = pool;

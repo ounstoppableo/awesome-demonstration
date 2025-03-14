@@ -1,4 +1,5 @@
 import pool from '@/app/lib/db';
+import redisPool from '@/app/lib/redis';
 import handleResponse, { ResponseMsg } from '@/utils/handleResponse';
 import { NextRequest } from 'next/server';
 
@@ -9,20 +10,30 @@ export async function GET(req: NextRequest) {
       const searchParams = req.nextUrl.searchParams;
       const componentName = searchParams.get('componentName') as string;
       const limit: number = +(searchParams.get('limit') || 2);
-      const searchRegexp = componentName.split('').join('.*');
+      const searchRegexp = new RegExp(`.*${componentName}.*`, 'i');
       try {
-        const [rowsTemp, fieldsTemp] = await pool.query(
-          'select * from componentInfo where name REGEXP ? limit 1',
-          [searchRegexp],
+        const client = await redisPool.acquire();
+        const componentNameMapIndex = await client.lRange(
+          `componentNameMapIndex`,
+          0,
+          -1,
         );
-        if (!rowsTemp || (rowsTemp as any).length === 0) {
+        let matchComponent;
+        for (let i = 0; i < componentNameMapIndex.length; i++) {
+          if (componentNameMapIndex[i].match(searchRegexp)) {
+            matchComponent = componentNameMapIndex[i];
+            break;
+          }
+        }
+        if (!matchComponent) {
           return handleCompleted({
             msg: '查询成功!',
             data: { result: [], index: null, page: null },
           });
         }
-        const target = (rowsTemp as any[])[0];
-        const page = Math.floor((target.index - 1) / limit) + 1;
+
+        const targetIndex = +matchComponent.split(':')[1];
+        const page = Math.floor((targetIndex - 1) / limit) + 1;
         const startIndex = (page - 1) * limit + 1;
         const endIndex = page * limit;
         const [rows, fields] = await pool.query(
@@ -51,9 +62,10 @@ export async function GET(req: NextRequest) {
             ? JSON.parse(item.reactRelevantFiles)
             : null,
         }));
+
         handleCompleted({
           msg: '查询成功!',
-          data: { pageList: result, index: target.index, page },
+          data: { pageList: result, index: targetIndex, page },
         });
       } catch (err) {
         console.error(err);

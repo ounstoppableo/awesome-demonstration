@@ -12,9 +12,14 @@ type FileContentParams = {
   fileName: string;
 };
 export const getFileContent = async (params: FileContentParams) => {
-  return await request(
+  const temp = localStorage.getItem(params.id + params.fileName);
+  if (temp && temp !== 'null' && temp !== 'undefined') return JSON.parse(temp);
+  const res = await request(
     `/api/fileContent?scope=${params.id}&fileName=${params.fileName}`,
   );
+  if (res.code === 200)
+    localStorage.setItem(params.id + params.fileName, JSON.stringify(res));
+  return res;
 };
 
 type PackageParseParams = {
