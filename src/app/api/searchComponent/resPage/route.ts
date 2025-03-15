@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
         if (!matchComponent) {
           return handleCompleted({
             msg: '查询成功!',
-            data: { result: [], index: null, page: null },
+            data: { pageList: [], index: null, page: null },
           });
         }
 

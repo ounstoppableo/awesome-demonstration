@@ -13,7 +13,7 @@ import { Carousel } from '@/components/carousel/carousel';
 import { current } from '@reduxjs/toolkit';
 
 export default function usePageCarouselLogic(props: any) {
-  const { setLoading, router } = props;
+  const { loading, setLoading, router } = props;
   const carouselRef = useRef<any>(null);
   const [slideData, setSlideData] = useState([]);
   const [shouldAddpage, setshouldAddpage] = useState(1);
@@ -25,26 +25,30 @@ export default function usePageCarouselLogic(props: any) {
   const [searchResIndex, setSearchResIndex] = useState<any>(null);
   const [random, setRandom] = useState(false);
   const [randomList, setRandomList] = useState([]);
+  const [lastPage, setLastPage] = useState<any>(null);
 
   const handleSetComponentList = () => {
     if (
-      componetListRaw[shouldAddpage] &&
-      componetListRaw[shouldAddpage].length === limit
+      (lastPage && shouldAddpage >= lastPage) ||
+      (componetListRaw[shouldAddpage] &&
+        componetListRaw[shouldAddpage].length === limit)
     )
       return;
     setLoading(true);
-    setCarouselAnimate(false);
     getComponentList({ page: shouldAddpage, limit }).then(async (res: any) => {
       if (res.code === 200) {
-        if (!res.data || res.data.length === 0) {
-          setCarouselAnimate(true);
-          setLoading(false);
-          return;
-        }
+        setCarouselAnimate(false);
         setComponentListRaw({
           ...componetListRaw,
           [shouldAddpage]: res.data,
         });
+        if (shouldAddpage === 1 && (!res.data || !res.data.length))
+          setLoading(false);
+        if (
+          (!res.data || !res.data.length || res.data.length < limit) &&
+          !lastPage
+        )
+          setLastPage(shouldAddpage);
       }
     });
   };
@@ -113,6 +117,11 @@ export default function usePageCarouselLogic(props: any) {
   }, [limit, shouldAddpage]);
 
   useEffect(() => {
+    setCurrentCarusalIndex(0);
+    setLastPage(null);
+  }, [limit]);
+
+  useEffect(() => {
     setComponentListFromRaw();
   }, [componetListRaw, random, randomList]);
 
@@ -122,7 +131,12 @@ export default function usePageCarouselLogic(props: any) {
 
   useEffect(() => {
     if (random) return;
-    if (!componentList || componentList.length === 0) return;
+    if (
+      !componentList ||
+      componentList.length === 0 ||
+      !componentList[currentCarusalIndex]
+    )
+      return;
     const currentPage =
       Math.floor((componentList[currentCarusalIndex].index - 1) / limit) + 1;
     const startIndex = (currentPage - 1) * limit;
@@ -139,20 +153,18 @@ export default function usePageCarouselLogic(props: any) {
   }, [currentCarusalIndex, limit, random]);
 
   useEffect(() => {
+    if (!slideData.length) return;
     setLoading(false);
+  }, [slideData]);
+
+  useEffect(() => {
     setCarouselAnimate(true);
   }, [slideData.length]);
 
-  const carousel = (
-    <Carousel
-      ref={carouselRef}
-      slides={slideData}
-      animate={carouselAnimate}
-      current={currentCarusalIndex}
-      setCurrent={setCurrentCarusalIndex}
-      handleClick={() => setSearchResIndex(null)}
-    />
-  );
+  useEffect(() => {
+    if (lastPage && lastPage <= shouldAddpage)
+      requestIdleCallback(() => setCarouselAnimate(true));
+  }, [lastPage]);
 
   const [searchComponentName, setSearchComponentName] = useState('');
   const handleSearch = (e: any) => {
@@ -166,17 +178,11 @@ export default function usePageCarouselLogic(props: any) {
     searchComponentResPage({ componentName: searchComponentName, limit }).then(
       (res) => {
         if (res.code === 200 && res.data.page && res.data.index) {
-          if (
-            componetListRaw[res.data.page] &&
-            componetListRaw[res.data.page].length === limit
-          ) {
-            setLoading(false);
-          } else {
-            setComponentListRaw({
-              ...componetListRaw,
-              [res.data.page]: res.data.pageList,
-            });
-          }
+          setComponentListRaw({
+            ...componetListRaw,
+            [res.data.page]: res.data.pageList,
+          });
+          if (res.data.pageList < limit) setLastPage(res.data.page);
         } else {
           setLoading(false);
         }
@@ -189,11 +195,11 @@ export default function usePageCarouselLogic(props: any) {
   const handleRandom = () => {
     setLoading(true);
     setRandom(true);
-    setCurrentCarusalIndex(0);
     randomComponent().then((res) => {
       if (res.code === 200) {
         setRandomList(res.data);
-        setLoading(false);
+        setCurrentCarusalIndex(0);
+        if (!res.data || !res.data.length) setLoading(false);
       }
     });
   };
@@ -213,6 +219,17 @@ export default function usePageCarouselLogic(props: any) {
       setCurrentCarusalIndex(0);
     }
   }, [random]);
+
+  const carousel = (
+    <Carousel
+      ref={carouselRef}
+      slides={slideData}
+      animate={carouselAnimate}
+      current={currentCarusalIndex}
+      setCurrent={setCurrentCarusalIndex}
+      handleClick={() => setSearchResIndex(null)}
+    />
+  );
 
   return {
     carousel,

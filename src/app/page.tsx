@@ -64,6 +64,7 @@ export default function MainPage() {
     setSearchComponentName,
     handleRandom,
   } = usePageCarouselLogic({
+    loading,
     setLoading,
     router,
   });
