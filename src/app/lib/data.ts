@@ -81,8 +81,16 @@ export const searchComponentResPage = async (params?: SearchComponent) => {
   );
 };
 
-export const swiftGetList = async () => {
-  return await request(`/api/swiftGetList`, {
-    method: 'GET',
-  });
+type SwiftGetList = {
+  componentName: string;
+  limit: number;
+  finalIndex: number;
+};
+export const swiftGetList = async (params: SwiftGetList) => {
+  return await request(
+    `/api/searchComponent/resNormal?componentName=${params?.componentName}&limit=${params?.limit}&finalIndex=${params?.finalIndex}`,
+    {
+      method: 'GET',
+    },
+  );
 };

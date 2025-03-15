@@ -1,4 +1,5 @@
 import pool from '@/app/lib/db';
+import getSearchParams from '@/utils/getSearchParams';
 import handleResponse, { ResponseMsg } from '@/utils/handleResponse';
 import { NextRequest } from 'next/server';
 
@@ -7,8 +8,8 @@ export async function GET(req: NextRequest) {
     req,
     async (req, handleCompleted, handleError) => {
       const searchParams = req.nextUrl.searchParams;
-      const page = +(searchParams.get('page') || 1);
-      const limit: number = +(searchParams.get('limit') || 2);
+      const page = +(getSearchParams(searchParams.get('page')) || 1);
+      const limit: number = +(getSearchParams(searchParams.get('limit')) || 2);
       const startIndex = (page - 1) * limit + 1;
       const endIndex = page * limit;
       try {

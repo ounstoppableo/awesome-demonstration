@@ -34,7 +34,7 @@ import {
   MultipleSelector,
   type Option,
 } from '@/components/multi-selector/index';
-import { cloneDeep, merge } from 'lodash';
+import { cloneDeep, isEmpty, merge } from 'lodash';
 import { Switch } from '@/components/switch';
 import { Input as FileUpload } from '@/components/file-upload/base';
 import { useEffect, useRef, useState } from 'react';
@@ -49,7 +49,7 @@ import {
   packageParse,
   swiftGetList,
 } from '../lib/data';
-import { Component, Minus, Pencil, Plus } from 'lucide-react';
+import { Component, Minus, Pencil, Plus, SearchIcon } from 'lucide-react';
 import {
   ComponentInfoFormType,
   formSchema,
@@ -59,9 +59,14 @@ import { Button } from '@/components/buttons/button-three';
 import Loading from '@/components/loading';
 import { setAlert, setAlertMsg } from '@/store/alert/alert-slice';
 import { useAppDispatch } from '@/store/hooks';
+import { Input as SuffixInput } from '@/components/suffix-input';
+import isDivScrolledToBottom from '@/utils/convention';
 
 export default function useAddComponentForm(props: any) {
   const { setDialogOpen } = props;
+  const [searchComponentName, setSearchComponentName] = useState('');
+  const [limit, setLimit] = useState(4);
+  const [isMax, setIsMax] = useState(false);
   const onBeforeUpload = (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size / 1024 / 1024 > 10) {
@@ -152,7 +157,7 @@ export default function useAddComponentForm(props: any) {
           form.clearErrors();
           return setActiveStep(e);
         }
-        if (e === 2) {
+        if (e === 2 && !params['editComponentId']) {
           handleGetComponentInfo();
         }
 
@@ -189,17 +194,65 @@ export default function useAddComponentForm(props: any) {
   ];
   const addOrEdit = form.watch('addOrEdit');
   const [componentList, setComponentList] = useState([]);
+  const getComponentList = (finalIndex = 0) => {
+    setShowLoadingForStepOneSelectItems(true);
+    swiftGetList({
+      componentName: searchComponentName,
+      finalIndex,
+      limit,
+    }).then((res) => {
+      if (res.code === 200) {
+        if (finalIndex === 0) {
+          setComponentList(res.data);
+          if (res.data.length === limit) setIsMax(false);
+        } else {
+          setComponentList(cloneDeep([...componentList, ...res.data]) as any);
+        }
+        if (res.data.length < limit) setIsMax(true);
+      }
+      hadRequest.current = false;
+      setShowLoadingForStepOneSelectItems(false);
+    });
+  };
   useEffect(() => {
     if (addOrEdit === 'edit') {
-      setShowLoadingForStepOneSelectItems(true);
-      swiftGetList().then((res) => {
-        if (res.code === 200) {
-          setComponentList(res.data);
-        }
-        setShowLoadingForStepOneSelectItems(false);
-      });
+      getComponentList();
     }
   }, [addOrEdit]);
+
+  const searchTimer = useRef<any>(null);
+  const handleSearch = (e: any, finalIndex = 0) => {
+    e?.stopPropagation?.();
+    if (
+      (e?.type === 'keyup' && e?.key !== 'Enter') ||
+      (e?.type !== 'click' && e?.type !== 'keyup')
+    )
+      return;
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      getComponentList(finalIndex);
+    }, 200);
+  };
+
+  const scrollRef = useRef(null);
+  const hadRequest = useRef(false);
+  const handleWheelScroll = (e: any) => {
+    if (isMax) return;
+    if (
+      isDivScrolledToBottom(
+        (scrollRef.current as any)?.querySelector(
+          '[data-radix-select-viewport]',
+        ),
+      )
+    ) {
+      if (hadRequest.current) return;
+      hadRequest.current = true;
+      handleSearch(
+        { type: 'click' },
+        (componentList[componentList.length - 1] as any)?.index || 0,
+      );
+    }
+  };
 
   const formItems = () => {
     switch (activeStep) {
@@ -263,10 +316,35 @@ export default function useAddComponentForm(props: any) {
                           <SelectValue placeholder="Select operate type" />
                         </SelectTrigger>
                         <SelectContent
-                          className={`[&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 ${showLoadingForStepOneSelectItems ? '' : '[&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2'}`}
+                          ref={scrollRef}
+                          className={`transform relative [&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2`}
                         >
+                          <div className="fixed top-1 inset-x-1 z-10">
+                            <SuffixInput
+                              className="w-full"
+                              placeholder="Component Name ..."
+                              value={searchComponentName}
+                              onKeyDown={(e) => e.stopPropagation()}
+                              onKeyUp={(e) => handleSearch(e)}
+                              onChange={(e) =>
+                                setSearchComponentName(e.target.value)
+                              }
+                            />
+                            <button
+                              className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg border border-transparent text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                              aria-label="Subscribe"
+                              onClick={(e) => handleSearch(e)}
+                            >
+                              <SearchIcon
+                                size={16}
+                                strokeWidth={2}
+                                aria-hidden="true"
+                              />
+                            </button>
+                          </div>
+
                           {showLoadingForStepOneSelectItems ? (
-                            <div className="relative h-24 w-full">
+                            <div className="fixed inset-0 z-10">
                               <Loading
                                 className="rounded-sm"
                                 showLoading={showLoadingForStepOneSelectItems}
@@ -274,26 +352,34 @@ export default function useAddComponentForm(props: any) {
                               ></Loading>
                             </div>
                           ) : (
-                            <SelectGroup>
-                              {componentList.length !== 0 ? (
-                                componentList.map((component: any) => {
-                                  return (
-                                    <SelectItem
-                                      value={component.id}
-                                      key={component.id}
-                                    >
-                                      <Component />
-                                      <span className="truncate">
-                                        {component.name}
-                                      </span>
-                                    </SelectItem>
-                                  );
-                                })
-                              ) : (
-                                <></>
-                              )}
-                            </SelectGroup>
+                            <></>
                           )}
+
+                          <div className="h-10"></div>
+                          <SelectGroup
+                            className="max-h-32"
+                            onWheel={handleWheelScroll}
+                          >
+                            {componentList.length !== 0 ? (
+                              componentList.map((component: any) => {
+                                return (
+                                  <SelectItem
+                                    value={component.id}
+                                    key={component.id}
+                                  >
+                                    <Component />
+                                    <span className="truncate">
+                                      {component.name}
+                                    </span>
+                                  </SelectItem>
+                                );
+                              })
+                            ) : (
+                              <div className="text-sm w-full h-32 flex justify-center items-center text-gray-400">
+                                什么也没有~
+                              </div>
+                            )}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -892,7 +978,10 @@ export default function useAddComponentForm(props: any) {
         return (
           <div className="p-4 flex justify-center items-center text-[24px] font-bold">
             <span className="scale-x-[-1]">🎉🎉</span>
-            <span className='gradiant-text animate-gradientMove'>Good Job!!!</span>🎉🎉
+            <span className="gradiant-text animate-gradientMove">
+              Good Job!!!
+            </span>
+            🎉🎉
           </div>
         );
     }

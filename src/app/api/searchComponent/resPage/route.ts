@@ -1,5 +1,6 @@
 import pool from '@/app/lib/db';
 import redisPool from '@/app/lib/redis';
+import getSearchParams from '@/utils/getSearchParams';
 import handleResponse, { ResponseMsg } from '@/utils/handleResponse';
 import { NextRequest } from 'next/server';
 
@@ -8,8 +9,10 @@ export async function GET(req: NextRequest) {
     req,
     async (req, handleCompleted, handleError) => {
       const searchParams = req.nextUrl.searchParams;
-      const componentName = searchParams.get('componentName') as string;
-      const limit: number = +(searchParams.get('limit') || 2);
+      const componentName = getSearchParams(
+        searchParams.get('componentName'),
+      ) as string;
+      const limit: number = +(getSearchParams(searchParams.get('limit')) || 2);
       const searchRegexp = new RegExp(`.*${componentName}.*`, 'i');
       try {
         const client = await redisPool.acquire();
