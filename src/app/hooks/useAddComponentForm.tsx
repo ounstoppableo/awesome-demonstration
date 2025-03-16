@@ -184,6 +184,7 @@ export default function useAddComponentForm(props: any) {
         dispatch(setAlert({ value: true, type: 'success' }));
         dispatch(setAlertMsg(res.msg));
         setDialogOpen(false);
+        handleStepChange(1);
       }
     });
   }

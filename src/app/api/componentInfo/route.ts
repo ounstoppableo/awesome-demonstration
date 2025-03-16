@@ -11,6 +11,7 @@ import {
 import { formatDataForBackendAdaptor } from '@/utils/dataFormat';
 import GlobalTag from '@/utils/globalTag';
 import useAuth from '../auth/hooks/useAuth';
+import redisPool from '@/app/lib/redis';
 
 export async function GET(req: NextRequest) {
   return await handleResponse(
@@ -168,7 +169,7 @@ export async function POST(req: NextRequest) {
               ? Object.values(storeSchema)
               : [storeSchema, storeSchema.id],
           )
-          .then(() => {
+          .then((data) => {
             connection.commit().then(() => {
               connection.release();
             });
@@ -184,6 +185,23 @@ export async function POST(req: NextRequest) {
         handleCompleted({
           msg: '添加成功!',
         });
+        try {
+          if (formContent.addOrEdit === 'add') {
+            const [rows, fields] = await pool.query(
+              'SELECT id,name,`index` FROM componentInfo WHERE `index` = (SELECT MAX(`index`) FROM componentInfo);',
+            );
+            if ((rows as any) && (rows as any).length !== 0) {
+              const client = await redisPool.acquire();
+              client.lPush(
+                'componentNameMapIndex',
+                `${(rows as any)[0].name}:${(rows as any)[0].index}:${(rows as any)[0].id}`,
+              );
+              redisPool.release(client);
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        }
       } catch (err: any) {
         handleError(err);
       }
