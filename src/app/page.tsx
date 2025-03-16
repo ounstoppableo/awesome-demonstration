@@ -177,7 +177,12 @@ export default function MainPage() {
 
     {
       title: 'Theme',
-      icon: theme !== 'dark' ? <Moon /> : <Sun />,
+      icon:
+        theme !== 'dark' ? (
+          <Moon className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        ) : (
+          <Sun className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        ),
       href: '#',
       handleClick: (e: any) => {
         const newTheme =
@@ -246,7 +251,7 @@ export default function MainPage() {
       <div className="flex flex-col items-center justify-end gap-[6%] absolute inset-0 overflow-hidden">
         <div className="w-full">{carousel}</div>
         <div className="z-50 flex items-center justify-center h-fit w-fit select-none pb-[2%]">
-          <FloatingDock mobileClassName="translate-y-20" items={links} />
+          <FloatingDock items={links} />
         </div>
       </div>
       {auth ? (

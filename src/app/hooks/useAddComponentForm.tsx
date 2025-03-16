@@ -317,7 +317,7 @@ export default function useAddComponentForm(props: any) {
                         </SelectTrigger>
                         <SelectContent
                           ref={scrollRef}
-                          className={`transform relative [&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2`}
+                          className={`pt-10 transform relative [&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2`}
                         >
                           <div className="fixed top-1 inset-x-1 z-10">
                             <SuffixInput
@@ -355,7 +355,6 @@ export default function useAddComponentForm(props: any) {
                             <></>
                           )}
 
-                          <div className="h-10"></div>
                           <SelectGroup
                             className="max-h-32"
                             onWheel={handleWheelScroll}
