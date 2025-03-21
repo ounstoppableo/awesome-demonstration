@@ -1,6 +1,7 @@
 import { useAppSelector } from '@/store/hooks';
 import { selectTheme } from '@/store/theme/theme-slice';
-import { useEffect, useState } from 'react';
+import addToFIFOQueue from '@/utils/iframeFIFOQueue';
+import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function useParentInfo(props: any) {
@@ -13,6 +14,8 @@ export default function useParentInfo(props: any) {
   } = props;
   const [frameworkReady, setFrameworkReady] = useState(false);
   const theme = useAppSelector(selectTheme);
+  const componentCanRenderPromise = useRef<any>({ resolve: null });
+  const [canRender, setCanRender] = useState(false);
 
   useEffect(() => {
     const secondHandshakeId = uuidv4();
@@ -42,7 +45,7 @@ export default function useParentInfo(props: any) {
   }, [componentInfoForParent.currentFramework]);
 
   useEffect(() => {
-    if (frameworkReady) {
+    if (frameworkReady && canRender) {
       setShowLoading(true);
       const messageData = {
         type: 'updateViewer',
@@ -70,7 +73,7 @@ export default function useParentInfo(props: any) {
         getServerAddr(componentInfoForParent.currentFramework),
       );
     }
-  }, [frameworkReady]);
+  }, [frameworkReady, canRender]);
 
   useEffect(() => {
     iframeRef.current?.contentWindow?.postMessage(
@@ -85,6 +88,32 @@ export default function useParentInfo(props: any) {
       getServerAddr(componentInfoForParent.currentFramework),
     );
   }, [theme]);
+
+  useEffect(() => {
+    const _producer = () => {
+      setCanRender(true);
+      return new Promise((resolve) => {
+        componentCanRenderPromise.current.resolve = resolve;
+      });
+    };
+    addToFIFOQueue(_producer);
+  }, []);
+
+  useEffect(() => {
+    const _cb = (e: any) => {
+      if (e.data.id !== soleId.current) return;
+      if (
+        e.data.type === 'componentLoadCompleted' ||
+        e.data.type === 'handleCompileError'
+      ) {
+        componentCanRenderPromise.current.resolve?.(1);
+      }
+    };
+    window.addEventListener('message', _cb);
+    return () => {
+      window.removeEventListener('message', _cb);
+    };
+  }, []);
 
   return {
     framework: componentInfoForParent.currentFramework,
