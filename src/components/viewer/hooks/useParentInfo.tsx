@@ -112,6 +112,7 @@ export default function useParentInfo(props: any) {
     window.addEventListener('message', _cb);
     return () => {
       window.removeEventListener('message', _cb);
+      componentCanRenderPromise.current.resolve?.(1);
     };
   }, []);
 
