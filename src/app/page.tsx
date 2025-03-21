@@ -248,9 +248,9 @@ export default function MainPage() {
   return (
     <div className="h-[100vh] w-[100vw] overflow-hidden">
       {alertVDom}
-      <div className="flex flex-col items-center justify-end gap-[6%] absolute inset-0 overflow-hidden">
+      <div className="flex flex-col items-center justify-center gap-[8%] absolute inset-0 overflow-hidden">
         <div className="w-full">{carousel}</div>
-        <div className="z-50 flex items-center justify-center h-fit w-fit select-none pb-[2%]">
+        <div className="z-50 flex items-center justify-center h-fit w-fit select-none max-sm:absolute max-sm:bottom-[8%] max-sm:scale-75">
           <FloatingDock items={links} />
         </div>
       </div>

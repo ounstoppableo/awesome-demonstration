@@ -235,6 +235,7 @@ export default function usePageCarouselLogic(props: any) {
     carousel,
     handleSearch,
     searchComponentName,
+    currentCarusalIndex,
     setSearchComponentName,
     handleRandom,
     setRandom,

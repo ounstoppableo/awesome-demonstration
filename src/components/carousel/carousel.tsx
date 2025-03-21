@@ -70,7 +70,7 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
     event.currentTarget.style.opacity = '1';
   };
 
-  const { getBackgroundEffect } = useBackground({ container: 'other' });
+  const { getBackgroundEffect } = useBackground({});
 
   const { slot, button, title, handleClick } = slide;
 

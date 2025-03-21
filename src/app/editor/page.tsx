@@ -46,6 +46,7 @@ export default function EditorContainer() {
   const handleGetComponentInfo = (framwork?: string) => {
     const id = searchParams.get('id');
     if (!id) return;
+    dispatch(clearComponentInfo(null));
     getComponentInfo({ id }).then(async (res) => {
       if (res.code === 200) {
         const componentInfoForViewer = formatDataToViewerAdaptor(
@@ -65,7 +66,6 @@ export default function EditorContainer() {
             componentInfoForViewer.entryFile
           ] = '';
         }
-        dispatch(clearComponentInfo(null));
         dispatch(setComponentInfo(componentInfoForViewer));
       }
     });
@@ -90,7 +90,7 @@ export default function EditorContainer() {
         >
           Home
         </Button>
-        <div className="h-10 flex items-center justify-center overflow-hidden p-1 w-10 hover:w-36 relative box-border cursor-pointer transition-all duration-200 rounded-[9999px] gradient-border">
+        <div className="relative h-10 flex items-center justify-center overflow-hidden p-1 w-10 hover:w-36  box-border cursor-pointer transition-all duration-200 rounded-[9999px] gradient-border">
           <div className="flex items-center h-10 reactive w-36">
             <div className="hover:rotate-[360deg] transition-all duration-200 reactive z-10 w-8 h-8">
               <div className="transition-all duration-200 bg-[url(https://www.unstoppable840.cn/assets/avatar.jpeg)] bg-blend-lighten bg-[#0ff] bg-center bg-contain w-full h-full rounded-[100%] relative after:absolute after:w-full after:h-full after:bg-[url(https://www.unstoppable840.cn/assets/avatar.jpeg)] after:bg-blend-lighten after:bg-[#f00] after:bg-center after:bg-contain after:rounded-[100%] after:mix-blend-darken after:animate-shake"></div>
@@ -105,7 +105,7 @@ export default function EditorContainer() {
             value={componentInfo.currentFramework}
             onValueChange={handleValueChange}
           >
-            <SelectTrigger className="[&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 [&>span_svg]:text-muted-foreground/80 w-[180px]">
+            <SelectTrigger className="[&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 [&>span_svg]:text-muted-foreground/80 w-[110px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="z-[1000] [&_*[role=option]>span>svg]:shrink-0 [&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2">

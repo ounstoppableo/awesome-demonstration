@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../store';
 import { removeParticle, setParticle } from '@/utils/particleControl';
 
-type BackgroundEffects = 'particles' | 'grid' | 'wave';
+type BackgroundEffects = 'grid' | 'wave';
 
 export interface BackgroundEffectsState {
   value: BackgroundEffects;
@@ -28,7 +28,6 @@ export const backgroundEffectMap: {
     removeBackground: () => any;
   };
 } = {
-  particles: { setBackground: setParticle, removeBackground: removeParticle },
   grid: { setBackground: () => {}, removeBackground: () => {} },
   wave: { setBackground: () => {}, removeBackground: () => {} },
 };
