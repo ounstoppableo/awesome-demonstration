@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/store/hooks';
 import { selectTheme } from '@/store/theme/theme-slice';
-import addToFIFOQueue from '@/utils/iframeFIFOQueue';
+import addToFIFOQueue, { clearQueue } from '@/utils/iframeFIFOQueue';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -45,7 +45,7 @@ export default function useParentInfo(props: any) {
   }, [componentInfoForParent.currentFramework]);
 
   useEffect(() => {
-    if (frameworkReady && canRender) {
+    if (canRender) {
       setShowLoading(true);
       const messageData = {
         type: 'updateViewer',
@@ -73,7 +73,7 @@ export default function useParentInfo(props: any) {
         getServerAddr(componentInfoForParent.currentFramework),
       );
     }
-  }, [frameworkReady, canRender]);
+  }, [canRender]);
 
   useEffect(() => {
     iframeRef.current?.contentWindow?.postMessage(
@@ -90,14 +90,16 @@ export default function useParentInfo(props: any) {
   }, [theme]);
 
   useEffect(() => {
-    const _producer = () => {
-      setCanRender(true);
-      return new Promise((resolve) => {
-        componentCanRenderPromise.current.resolve = resolve;
-      });
-    };
-    addToFIFOQueue(_producer);
-  }, []);
+    if (frameworkReady) {
+      const _producer = () => {
+        setCanRender(true);
+        return new Promise((resolve) => {
+          componentCanRenderPromise.current.resolve = resolve;
+        });
+      };
+      addToFIFOQueue(_producer);
+    }
+  }, [frameworkReady]);
 
   useEffect(() => {
     const _cb = (e: any) => {
@@ -113,6 +115,7 @@ export default function useParentInfo(props: any) {
     return () => {
       window.removeEventListener('message', _cb);
       componentCanRenderPromise.current.resolve?.(1);
+      clearQueue();
     };
   }, []);
 

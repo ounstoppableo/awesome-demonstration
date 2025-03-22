@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         if (formContent.addOrEdit === 'edit') {
           const currentFileNames = files.map((file) => file.fileName);
           const [originalFiles] = await connection.query(
-            'select fileName from fileMap where scope = ?',
+            'select fileName from fileMap where id = ?',
             [formContent.editComponentId],
           );
           const deleteFiles = (originalFiles as any[])?.filter(
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
                 new Promise(async (resolve) => {
                   try {
                     await connection.query(
-                      'delete from fileMap where scope=? and fileName=?',
+                      'delete from fileMap where id=? and fileName=?',
                       [formContent.editComponentId, file.fileName],
                     );
                     resolve(1);
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                 const shouldUpdate = shouldUpdateFiles?.includes(item.fileName);
                 connection
                   .query(
-                    `${shouldUpdate ? 'update' : 'insert into'}  ${shouldUpdate ? 'fileMap set fileContent=? where fileName=? and scope=?' : 'fileMap (fileContent,fileName ,scope) VALUES (?,?,?)'}`,
+                    `${shouldUpdate ? 'update' : 'insert into'}  ${shouldUpdate ? 'fileMap set fileContent=? where fileName=? and id=?' : 'fileMap (fileContent,fileName ,scope) VALUES (?,?,?)'}`,
                     [item.fileContent, item.fileName, storeSchema.id],
                   )
                   .then(() => {

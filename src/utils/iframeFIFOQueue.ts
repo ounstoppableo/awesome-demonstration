@@ -23,4 +23,8 @@ const traverse = async () => {
   }
 };
 
+export const clearQueue = () => {
+  _cache.length = 0;
+  _iframeFIFOQueue.length = 0;
+};
 export default addToFIFOQueue;

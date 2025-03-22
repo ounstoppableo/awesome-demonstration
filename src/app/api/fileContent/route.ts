@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         let result = await client.get(`fileMap:${scope}:${fileName}`);
         if (!result) {
           const [rows, fields] = await pool.query(
-            'select fileContent from fileMap where scope=? and fileName=?',
+            'select fileContent from fileMap where id=? and fileName=?',
             [scope, fileName],
           );
           result = (rows as any)[0];
