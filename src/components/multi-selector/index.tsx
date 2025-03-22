@@ -8,6 +8,7 @@ import { forwardRef, useEffect } from 'react';
 import { Badge } from './badge';
 import { Command, CommandGroup, CommandItem, CommandList } from './command';
 import { cn } from '@/lib/utils';
+import { cloneDeep } from 'lodash';
 
 export interface Option {
   value: string;
@@ -411,6 +412,20 @@ const MultipleSelector = React.forwardRef<
       return undefined;
     }, [creatable, commandProps?.filter]);
 
+    const handleDrag = (e: any) => {
+      e.preventDefault();
+      e.dataTransfer.effectAllowed = 'move';
+    };
+    const handleDrop = (e: any) => {
+      const sourceIndex = e.dataTransfer.getData('text/plain');
+      const selectedCopy = cloneDeep(selected);
+      const temp = selectedCopy[sourceIndex];
+      selectedCopy.splice(sourceIndex, 1);
+      selectedCopy.splice(e.target.dataset.index, 0, temp);
+      setSelected(selectedCopy);
+      onChange?.(selectedCopy);
+    };
+
     return (
       <Command
         ref={dropdownRef}
@@ -445,13 +460,20 @@ const MultipleSelector = React.forwardRef<
           }}
         >
           <div className="relative flex flex-wrap gap-1">
-            {selected.map((option) => {
+            {selected.map((option, index) => {
               return (
                 <Badge
                   key={option.value}
+                  draggable
+                  data-index={index}
+                  onDragStart={(e) =>
+                    e.dataTransfer.setData('text/plain', index + '')
+                  }
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
                   className={cn(
-                    'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
-                    'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                    'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground cursor-pointer',
+                    'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground overflow-hidden',
                     badgeClassName,
                   )}
                   data-fixed={option.fixed}
