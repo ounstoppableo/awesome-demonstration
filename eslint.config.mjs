@@ -25,6 +25,8 @@ const eslintConfig = [
       'prefer-const': 'off',
       'prefer-spread': 'off',
       '@next/next/no-img-element': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'react/display-name': 'off',
     },
   },
 ];
