@@ -44,12 +44,21 @@ import { useForm } from 'react-hook-form';
 
 import {
   addComponentInfo,
+  deleteComponent,
   getComponentInfo,
   getComponentList,
   packageParse,
   swiftGetList,
 } from '../lib/data';
-import { Component, Minus, Pencil, Plus, SearchIcon } from 'lucide-react';
+import {
+  CircleX,
+  Component,
+  Delete,
+  Minus,
+  Pencil,
+  Plus,
+  SearchIcon,
+} from 'lucide-react';
 import {
   ComponentInfoFormType,
   formSchema,
@@ -61,6 +70,18 @@ import { setAlert, setAlertMsg } from '@/store/alert/alert-slice';
 import { useAppDispatch } from '@/store/hooks';
 import { Input as SuffixInput } from '@/components/suffix-input';
 import isDivScrolledToBottom from '@/utils/convention';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/alert-dialog';
+import { buttonVariants } from '@/components/buttons/button-one';
 
 export default function useAddComponentForm(props: any) {
   const { setDialogOpen } = props;
@@ -255,6 +276,18 @@ export default function useAddComponentForm(props: any) {
     }
   };
 
+  const handleComponentDelete = async (id: string) => {
+    setShowLoadingForStepOneSelectItems(true);
+    const res = await deleteComponent({ id });
+    if (res.code === 200) {
+      dispatch(setAlert({ value: true, type: 'success' }));
+      dispatch(setAlertMsg(res.msg));
+      setDialogOpen(false);
+      getComponentList();
+    }
+    setShowLoadingForStepOneSelectItems(false);
+  };
+
   const formItems = () => {
     switch (activeStep) {
       case 1:
@@ -363,15 +396,68 @@ export default function useAddComponentForm(props: any) {
                             {componentList.length !== 0 ? (
                               componentList.map((component: any) => {
                                 return (
-                                  <SelectItem
-                                    value={component.id}
+                                  <div
+                                    className="relative flex items-center"
                                     key={component.id}
                                   >
-                                    <Component />
-                                    <span className="truncate">
-                                      {component.name}
-                                    </span>
-                                  </SelectItem>
+                                    <SelectItem value={component.id}>
+                                      <Component />
+                                      <span className="truncate">
+                                        {component.name}
+                                      </span>
+                                    </SelectItem>
+                                    {form.watch('editComponentId') !==
+                                    component.id ? (
+                                      <div
+                                        className="absolute right-2"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                        }}
+                                      >
+                                        <AlertDialog>
+                                          <AlertDialogTrigger asChild>
+                                            <CircleX
+                                              size={14}
+                                              className="cursor-pointer text-gray-400 hover:text-gray-800 z-1"
+                                            />
+                                          </AlertDialogTrigger>
+                                          <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                              <AlertDialogTitle>
+                                                Delete Component?
+                                              </AlertDialogTitle>
+                                              <AlertDialogDescription>
+                                                This is a dangerous operation,
+                                                after deleting the component
+                                                will be removed from the
+                                                database forever.
+                                              </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                              <AlertDialogCancel>
+                                                Cancel
+                                              </AlertDialogCancel>
+                                              <AlertDialogAction
+                                                className={buttonVariants({
+                                                  variant: 'destructive',
+                                                })}
+                                                onClick={() =>
+                                                  handleComponentDelete(
+                                                    component.id,
+                                                  )
+                                                }
+                                              >
+                                                Continue
+                                              </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                          </AlertDialogContent>
+                                        </AlertDialog>
+                                      </div>
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </div>
                                 );
                               })
                             ) : (

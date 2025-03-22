@@ -94,3 +94,12 @@ export const swiftGetList = async (params: SwiftGetList) => {
     },
   );
 };
+
+type DeleteComponent = {
+  id: string;
+};
+export const deleteComponent = async (params: DeleteComponent) => {
+  return await request(`/api/deleteComponent?id=${params.id}`, {
+    method: 'DELETE',
+  });
+};
