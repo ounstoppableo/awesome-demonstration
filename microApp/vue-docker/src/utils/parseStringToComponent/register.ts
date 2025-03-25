@@ -33,7 +33,18 @@ export function Register(target: typeof ParseStringToComponent, _: any) {
       const sfcString = await this._store.getFileContent(fileName);
       this.parseToComponent(sfcString, name);
     }
-    async handleStringToComponent(componentString: string, name: string) {
+    async handleStringToComponent(
+      componentString: string,
+      name: string,
+      preDefinitionScriptContext: string,
+    ) {
+      const lang = componentString.match(
+        /<script[^>]*lang=['"](\w+)['"][^>]*>/,
+      )?.[1];
+      preDefinitionScriptContext =
+        `<script lang="${lang ? lang : 'js'}">` +
+        preDefinitionScriptContext +
+        '</script>';
       const options = {
         moduleCache: { vue: Vue },
         async getFile(url?: any) {
@@ -63,7 +74,11 @@ export function Register(target: typeof ParseStringToComponent, _: any) {
           }
           styleString += '</style>';
           return Promise.resolve(
-            componentString.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, '') +
+            preDefinitionScriptContext +
+              componentString.replace(
+                /<style\b[^>]*>([\s\S]*?)<\/style>/gi,
+                '',
+              ) +
               styleString,
           );
         },

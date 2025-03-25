@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                 const shouldUpdate = shouldUpdateFiles?.includes(item.fileName);
                 connection
                   .query(
-                    `${shouldUpdate ? 'update' : 'insert into'}  ${shouldUpdate ? 'fileMap set fileContent=? where fileName=? and id=?' : 'fileMap (fileContent,fileName ,scope) VALUES (?,?,?)'}`,
+                    `${shouldUpdate ? 'update' : 'insert into'}  ${shouldUpdate ? 'fileMap set fileContent=? where fileName=? and id=?' : 'fileMap (fileContent,fileName ,id) VALUES (?,?,?);'}`,
                     [item.fileContent, item.fileName, storeSchema.id],
                   )
                   .then(() => {

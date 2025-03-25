@@ -480,6 +480,7 @@ export default class ParseStringToComponent {
             resolve(null);
           };
         });
+        return '';
       }
       if (this.componentInfo.relevantPackages.includes(imports[i].source)) {
         const importContent = await this.handleGetFileContent(
@@ -489,16 +490,15 @@ export default class ParseStringToComponent {
           imports[i].source,
           CommonParseTools.tsxTransJsx(importContent),
         );
+        return `
+        ${imports
+          .map((item: any) => {
+            return `const ${item.local} = window.modulesMap['${item.source}']['${item.imported ? item.imported : item.local}'];\n`;
+          })
+          .join('')}
+      `;
       }
     }
-
-    return `
-      ${imports
-        .map((item: any) => {
-          return `const ${item.local} = window.modulesMap['${item.source}']['${item.imported ? item.imported : item.local}'];\n`;
-        })
-        .join('')}
-    `;
   }
 
   async generateModuleValue(fileName: string, moduleContent: string) {
@@ -551,6 +551,7 @@ export default class ParseStringToComponent {
   async handleStringToComponent(
     componentString: string,
     name: string,
+    preDefinitionScriptContext?: string,
   ): Promise<any> {
     throw new Error('handleStringToComponent应该被注册!');
   }
@@ -597,6 +598,7 @@ export default class ParseStringToComponent {
     }
 
     let preDefinitionContext = '';
+    let preDefinitionScriptContext = '';
     for (let i = 0; i < filterImports.length; i++) {
       componentString = componentString.replace(filterImports[i], '');
       const ast = acorn.parse(filterImports[i], {
@@ -624,9 +626,9 @@ export default class ParseStringToComponent {
         (ast.body[0] as any).source.value?.endsWith('.ts') ||
         (ast.body[0] as any).source.value?.endsWith('.js')
       ) {
-        preDefinitionContext += await this.handleDisposeImportJsPackage(
-          filterImports[i],
-        );
+        const temp = await this.handleDisposeImportJsPackage(filterImports[i]);
+        preDefinitionContext += temp;
+        preDefinitionScriptContext += temp;
       }
 
       if (
@@ -641,6 +643,10 @@ export default class ParseStringToComponent {
 
     componentString = preDefinitionContext + componentString;
 
-    return await this.handleStringToComponent(componentString, name);
+    return await this.handleStringToComponent(
+      componentString,
+      name,
+      preDefinitionScriptContext,
+    );
   }
 }

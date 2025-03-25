@@ -2,6 +2,7 @@ import pool from '@/app/lib/db';
 import redisPool from '@/app/lib/redis';
 import handleResponse, { ResponseMsg } from '@/utils/handleResponse';
 import { NextRequest } from 'next/server';
+import useAuth from '../auth/hooks/useAuth';
 
 export async function DELETE(req: NextRequest) {
   return await handleResponse(
@@ -11,11 +12,13 @@ export async function DELETE(req: NextRequest) {
       const id = searchParams.get('id') as string;
       if (!id) handleError(ResponseMsg.paramsError);
       try {
+        if (!(await useAuth())) return handleError(ResponseMsg.authError);
         const connection = await pool.getConnection();
         try {
           await connection.beginTransaction();
-          await connection.query('delete from componentInfo where id = ?', [
-            id,
+          await Promise.all([
+            connection.query('delete from componentInfo where id = ?', [id]),
+            connection.query('delete from fileMap where id = ?', [id]),
           ]);
           await connection.query('SET @row_number = 0;');
           await connection.query(
