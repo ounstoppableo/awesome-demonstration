@@ -98,28 +98,17 @@ export default function Viewer(props: {
     };
   }, []);
 
-  function destroyIframe(iframe: any) {
-    if (!iframe) return;
-
-    try {
-      if (iframe.contentWindow) {
-        iframe.contentWindow.document.open();
-        iframe.contentWindow.document.write('');
-        iframe.contentWindow.document.close();
-        iframe.contentWindow = null;
-      }
-    } catch (e) {}
-
-    iframe.src = 'about:blank';
-
-    iframe.remove();
+  function gc() {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: 'unMounted' },
+      getServerAddr(framework),
+    );
   }
 
   useEffect(() => {
-    // const iframe = iframeRef.current;
-    // return () => {
-    //   destroyIframe(iframe);
-    // };
+    return () => {
+      gc();
+    };
   }, []);
 
   return (

@@ -31,6 +31,8 @@ export default function Viewer() {
   const [randomKey, setRandomKey] = useState(Math.random());
   const soleId = useRef(uuidv4());
   const errorBoundaryRef = useRef<any>(null);
+  const gc = () => {};
+
   useEffect(() => {
     window.parent.postMessage(
       { type: 'frameworkReady', data: '我准备好了~', id: soleId.current },
@@ -67,6 +69,9 @@ export default function Viewer() {
           },
           location.protocol + '//' + location.hostname + ':7777',
         );
+      }
+      if (e.data.type === 'unMounted') {
+        gc();
       }
     };
     window.addEventListener('message', handleMsgCb);
