@@ -242,7 +242,7 @@ export default function MainPage() {
     formStep,
     AddComponentForm,
     handleSubmitBtnClick,
-    showLoadingForStepTwo,
+    showLoadingForDialog,
   } = useAddComponentForm({ setDialogOpen });
 
   return (
@@ -274,7 +274,7 @@ export default function MainPage() {
             {AddComponentForm}
             <Loading
               className={'rounded-lg'}
-              showLoading={showLoadingForStepTwo}
+              showLoading={showLoadingForDialog}
               cubeSize={60}
             ></Loading>
             <DialogFooter>

@@ -101,7 +101,7 @@ export default function useAddComponentForm(props: any) {
     showLoadingForStepOneSelectItems,
     setShowLoadingForStepOneSelectItems,
   ] = useState(false);
-  const [showLoadingForStepTwo, setShowLoadingForStepTwo] = useState(false);
+  const [showLoadingForDialog, setShowLoadingForDialog] = useState(false);
   const dispatch = useAppDispatch();
 
   const form = useForm<ComponentInfoFormType>({
@@ -149,7 +149,7 @@ export default function useAddComponentForm(props: any) {
   };
   const handleGetComponentInfo = () => {
     if (form.getValues('addOrEdit') === 'add') return form.reset();
-    setShowLoadingForStepTwo(true);
+    setShowLoadingForDialog(true);
     getComponentInfo({ id: form.getValues('editComponentId') as string }).then(
       (res) => {
         if (res.code === 200) {
@@ -161,7 +161,7 @@ export default function useAddComponentForm(props: any) {
             );
           });
         }
-        setShowLoadingForStepTwo(false);
+        setShowLoadingForDialog(false);
       },
     );
   };
@@ -199,11 +199,13 @@ export default function useAddComponentForm(props: any) {
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    setShowLoadingForDialog(true);
     addComponentInfo(values).then((res) => {
       if (res.code === 200) {
         form.reset();
         dispatch(setAlert({ value: true, type: 'success' }));
         dispatch(setAlertMsg(res.msg));
+        setShowLoadingForDialog(false);
         setDialogOpen(false);
         handleStepChange(1);
       }
@@ -1098,6 +1100,6 @@ export default function useAddComponentForm(props: any) {
     formStep: activeStep,
     AddComponentForm,
     handleSubmitBtnClick,
-    showLoadingForStepTwo,
+    showLoadingForDialog,
   };
 }
