@@ -33,6 +33,7 @@ export default function Viewer() {
   const errorBoundaryRef = useRef<any>(null);
   const gc = () => {
     (window as any).React = null;
+    document.body.innerHTML = '';
   };
 
   useEffect(() => {

@@ -9,7 +9,6 @@ async function parseCssModule(cssCode: string): Promise<any> {
   const result = await postcss([
     postcssModules({
       getJSON(_, json) {
-        console.log(json);
         Object.assign(classMap, json); // 收集解析后的 className
       },
       generateScopedName: '[name]__[local]__[hash:base64:5]', // 生成类似 Webpack 的哈希类名
@@ -25,7 +24,6 @@ export async function POST(req: NextRequest) {
     async (req, handleCompleted, handleError) => {
       const body = await req.json();
       const fileContent = body.fileContent as string;
-      if (!(await useAuth())) return handleError(ResponseMsg.authError);
       try {
         const result = await parseCssModule(fileContent);
         handleCompleted({

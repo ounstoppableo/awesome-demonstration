@@ -98,16 +98,14 @@ export default function Viewer(props: {
     };
   }, []);
 
-  function gc() {
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: 'unMounted' },
-      getServerAddr(framework),
-    );
+  function gc(iframeWindow: any) {
+    iframeWindow?.postMessage({ type: 'unMounted' }, '*');
   }
 
   useEffect(() => {
+    const iframe = iframeRef.current;
     return () => {
-      gc();
+      gc(iframe?.contentWindow);
     };
   }, []);
 
