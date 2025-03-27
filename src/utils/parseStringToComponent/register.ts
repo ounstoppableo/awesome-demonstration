@@ -26,6 +26,7 @@ export function Register(target: typeof ParseStringToComponent) {
     static _parseLanguage = 'react';
     static handleInstallDependence(): void {
       if (typeof window !== 'undefined') {
+        (window as any).React = null;
         (window as any).React = React;
       }
     }
@@ -67,29 +68,30 @@ export function Register(target: typeof ParseStringToComponent) {
         },
       ).code;
 
+      componentString = CommonParseTools.clearImportKeyWords(componentString);
       const components = CommonParseTools.getFunctionAndReturn(componentString)
         .filter((item: any) => item.returnValue === '<component>')
         .map((item: any) => item.functionName);
 
       componentString += `
-if(!window._components['${name}']) window._components['${name}'] = {};
-      ${components
-        .map((component: any) => {
-          return `
-        window._components['${name}']['${component}'] = ${component};
-        `;
-        })
-        .join(';')}
-  `;
-      eval(componentString);
+      if(!window._components['${name}']) window._components['${name}'] = {};
+            ${components
+              .map((component: any) => {
+                return `
+              window._components['${name}']['${component}'] = ${component};
+              `;
+              })
+              .join(';')}`;
+
+      eval(`(function(React, useState, useEffect,useRef,useActionState,useCallback,useContext,useDebugValue,useDeferredValue,useId,useImperativeHandle,useInsertionEffect,useLayoutEffect,useMemo,useOptimistic,useReducer,useSyncExternalStore,useTransition) {
+        ${componentString}
+      })(React,React.useState, React.useEffect,React.useRef,React.useActionState,React.useCallback,React.useContext,React.useDebugValue,React.useDeferredValue,React.useId,React.useImperativeHandle,React.useInsertionEffect,React.useLayoutEffect,React.useMemo,React.useOptimistic,React.useReducer,React.useSyncExternalStore,React.useTransition)`);
 
       const result: any = {};
 
       components.forEach((component: any) => {
         result[component] = (window as any)._components[name][component];
       });
-
-
 
       return result;
     }

@@ -25,13 +25,15 @@ function useDeepCompareEffect(
 }
 
 export default function Viewer() {
-  const [root, setRoot] = useState(null);
+  const [Root, setRoot] = useState<any>(null);
   const dispatch = useDispatch();
   const componentInfo = useAppSelector(selectComponentInfo);
   const [randomKey, setRandomKey] = useState(Math.random());
   const soleId = useRef(uuidv4());
   const errorBoundaryRef = useRef<any>(null);
-  const gc = () => {};
+  const gc = () => {
+    (window as any).React = null;
+  };
 
   useEffect(() => {
     window.parent.postMessage(
@@ -87,9 +89,15 @@ export default function Viewer() {
         );
         const components = await parseStringToComponent.parseToComponent(
           componentInfo.fileContentsMap[componentInfo.entryFile],
-          'root',
+          'Root',
         );
-        setRoot(components as any);
+        setRoot(
+          React.forwardRef(
+            components[
+              Object.keys(components)?.[Object.keys(components)?.length - 1]
+            ],
+          ) as any,
+        );
         window.parent.postMessage(
           {
             type: 'componentLoadCompleted',
@@ -110,15 +118,18 @@ export default function Viewer() {
 
   useEffect(() => {
     setRandomKey(Math.random());
-  }, [root]);
+  }, [Root]);
 
   const safeResult = () => {
     try {
       return (
         <ErrorBoundary ref={errorBoundaryRef} soleId={soleId}>
-          {root ? (
-            <div key={randomKey} className="bg-transparent">
-              {(root as any)[Object.keys(root)[Object.keys(root).length - 1]]()}
+          {Root ? (
+            <div
+              key={randomKey}
+              className="bg-transparent absolute inset-0 flex justify-center items-center"
+            >
+              <Root></Root>
             </div>
           ) : (
             <div className="flex justify-center items-center absolute inset-0 bg-transparent">

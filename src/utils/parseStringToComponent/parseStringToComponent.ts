@@ -83,6 +83,10 @@ export class CommonParseTools {
       );
   };
 
+  static clearImportKeyWords = (odeContent: string) => {
+    return odeContent.replace(/^\s*import\s+.*?;\s*$/gm, '');
+  };
+
   static getDeclarationFromContent = (codeContent: string) => {
     const ast = acorn.parse(codeContent, {
       sourceType: 'module',
@@ -180,7 +184,11 @@ export class CommonParseTools {
 
         return '<non-literal>'; // 其他类型
       } else if (node.type === 'ArrowFunctionExpression' && node.body) {
-        if (node.body.type === 'BlockStatement') {
+        if (
+          node.body.type === 'BlockStatement' &&
+          node.body.body[0] &&
+          node.body.body[0].argument
+        ) {
           if (
             node.body.body[0].argument.callee?.object?.name === 'React' &&
             node.body.body[0].argument.callee?.property?.name ===

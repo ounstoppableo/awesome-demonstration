@@ -94,6 +94,7 @@ export default function useAddComponentForm(props: any) {
         return false;
       }
     }
+    setShowLoadingForDialog(true);
     return true;
   };
 
@@ -634,6 +635,7 @@ export default function useAddComponentForm(props: any) {
                                 }
                                 render={({ field }) => {
                                   const onUploadSuccess = (res: any) => {
+                                    setShowLoadingForDialog(false);
                                     if (res.code === 200) {
                                       form.setValue(
                                         `files.${framework}.entryFile.filePath` as any,
@@ -827,6 +829,7 @@ export default function useAddComponentForm(props: any) {
                                             const onUploadSuccess = (
                                               res: any,
                                             ) => {
+                                              setShowLoadingForDialog(false);
                                               if (res.code === 200) {
                                                 form.setValue(
                                                   `files.${framework}.relevantFiles[${index}].filePath` as any,
