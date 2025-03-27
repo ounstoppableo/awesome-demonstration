@@ -184,15 +184,14 @@ export class CommonParseTools {
 
         return '<non-literal>'; // 其他类型
       } else if (node.type === 'ArrowFunctionExpression' && node.body) {
-        if (
-          node.body.type === 'BlockStatement' &&
-          node.body.body[0] &&
-          node.body.body[0].argument
-        ) {
+        if (node.body.type === 'BlockStatement') {
+          const returnNode = node.body.body?.find(
+            (item: any) => item.type === 'ReturnStatement',
+          );
           if (
-            node.body.body[0].argument.callee?.object?.name === 'React' &&
-            node.body.body[0].argument.callee?.property?.name ===
-              'createElement'
+            returnNode &&
+            returnNode.argument.callee?.object?.name === 'React' &&
+            returnNode.argument.callee?.property?.name === 'createElement'
           ) {
             return '<component>';
           }

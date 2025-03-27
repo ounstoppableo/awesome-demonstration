@@ -70,9 +70,12 @@ export function Register(target: typeof ParseStringToComponent) {
 
       componentString = CommonParseTools.clearImportKeyWords(componentString);
       const components = CommonParseTools.getFunctionAndReturn(componentString)
-        .filter((item: any) => item.returnValue === '<component>')
+        .filter(
+          (item: any) =>
+            item.returnValue === '<component>' &&
+            item.functionName !== '<anonymous>',
+        )
         .map((item: any) => item.functionName);
-
       componentString += `
       if(!window._components['${name}']) window._components['${name}'] = {};
             ${components
