@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### 介绍🎉
 
-## Getting Started
+这是一个关于**内容展示**应用的源码，可以把它称作『**Awesome Demonstration**』，它支持：
 
-First, run the development server:
+- [x] 组件上传
+- [x] 组件在线编辑
+- [x] Vue/React/HTML语言支持
+- [x] 其他一些趣味小功能
+- [x] 响应式布局
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 启动方法
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### mysql数据库字段
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- componentInfo表
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+  | 列                 | 数据类型      | 键   | 默认              |
+  | ------------------ | ------------- | ---- | ----------------- |
+  | id                 | varchar(100)  | PRI  |                   |
+  | name               | varchar(100)  |      |                   |
+  | framework          | varchar(100)  |      | '[]'              |
+  | vueEntryFileName   | varchar(100)  |      |                   |
+  | vueRelevantFiles   | varchar(1000) |      |                   |
+  | vueExternalFiles   | varchar(1000) |      |                   |
+  | htmlEntryFileName  | varchar(100)  |      |                   |
+  | htmlRelevantFiles  | varchar(1000) |      |                   |
+  | htmlExternalFiles  | varchar(1000) |      |                   |
+  | reactEntryFileName | varchar(100)  |      |                   |
+  | reactRelevantFiles | varchar(1000) |      |                   |
+  | reactExternalFiles | varchar(1000) |      |                   |
+  | createTime         | timestamp     |      | CURRENT_TIMESTAMP |
+  | index              | int(11)       |      |                   |
 
-## Learn More
+  触发器：
 
-To learn more about Next.js, take a look at the following resources:
+  ~~~sql
+  CREATE DEFINER=`root`@`%` TRIGGER before_insert_componentInfo
+  BEFORE INSERT ON componentInfo
+  FOR EACH ROW
+  BEGIN
+      DECLARE new_index INT;
+      SELECT COALESCE(MAX(`index`), 0) + 1 INTO new_index FROM componentInfo;
+      SET NEW.`index` = new_index;
+  END
+  ~~~
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- fileMap表
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+  | 列          | 数据类型     | 键   | 默认 |
+  | ----------- | ------------ | ---- | ---- |
+  | id          | varchar(100) | PRI  |      |
+  | fileName    | varchar(100) | PRI  |      |
+  | fileContent | text         |      |      |
 
-## Deploy on Vercel
+#### redis
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+启动一个redis服务，应用默认会连接3号数据库，如果有需要可以到/awesome-demonstration/src/app/lib/redis.ts中修改。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### 环境配置
+
+在根目录添加.env.local文件：
+
+~~~
+DB_HOST=mysql服务域名
+DB_USER=username
+DB_PASSWORD=password
+DB_NAME=awesome_demonstration
+
+AUTH_ADDR=token认证地址，这个需要自己实现（用于文件上传、组件添加等接口）
+
+SERVER_PORT=应用启动端口
+
+REDIS_HOST=redis服务域名
+REDIS_PORT=redis服务端口
+~~~
+
+#### 启动命令
+
+~~~sh
+pnpm i
+pnpm run dev
+~~~
+
