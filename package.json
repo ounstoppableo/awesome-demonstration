@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"node server.js\"  \"lerna run dev\" --paralle",
+    "dev": "concurrently \"node server.js -h 0.0.0.0\"  \"lerna run dev\" --paralle",
     "build": "next build",
     "start": "next start -p 4444",
     "lint": "next lint"
