@@ -32,7 +32,7 @@ import { formatDataToViewerAdaptor } from '@/utils/dataFormat';
 import { useAppSelector } from '@/store/hooks';
 import useAlert from '@/components/alert/useAlert';
 import usePersistTheme from '@/hooks/usePersistTheme';
-import useFavicon from '../hooks/useFavIcon';
+import useMobileEnd from '../hooks/useMobileEnd';
 //@ts-ignore
 import anime from 'animejs/lib/anime.es.js';
 
@@ -78,7 +78,7 @@ export default function EditorContainer() {
     handleGetComponentInfo();
   }, []);
 
-  useFavicon();
+  useMobileEnd();
 
   const { alertVDom } = useAlert({});
 

@@ -46,7 +46,7 @@ import {
 } from '@/components/confetti';
 import usePageCarouselLogic from './hooks/usePageCarouselLogic';
 import { Input } from '@/components/suffix-input';
-import useFavicon from './hooks/useFavIcon';
+import useMobileEnd from './hooks/useMobileEnd';
 
 export default function MainPage() {
   const theme = useAppSelector(selectTheme);
@@ -233,7 +233,7 @@ export default function MainPage() {
     token && localStorage.setItem('token', token);
   }, []);
 
-  useFavicon();
+  useMobileEnd();
 
   const { getBackgroundEffect } = useBackground({ container: 'background' });
 
