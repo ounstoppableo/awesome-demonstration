@@ -232,6 +232,18 @@ export default function MainPage() {
     token && localStorage.setItem('token', token);
   }, []);
 
+  useEffect(() => {
+    document.getElementById('iconLink')?.remove();
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.id = 'iconLink';
+    favicon.href = 'https://www.unstoppable840.cn/assets/favicon.ico';
+    document.head.appendChild(favicon);
+    return () => {
+      document.getElementById('iconLink')?.remove();
+    };
+  }, []);
+
   const { getBackgroundEffect } = useBackground({ container: 'background' });
 
   const { auth } = useAuth();
