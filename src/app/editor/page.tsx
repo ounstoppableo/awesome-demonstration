@@ -32,6 +32,9 @@ import { formatDataToViewerAdaptor } from '@/utils/dataFormat';
 import { useAppSelector } from '@/store/hooks';
 import useAlert from '@/components/alert/useAlert';
 import usePersistTheme from '@/hooks/usePersistTheme';
+import useFavicon from '../hooks/useFavIcon';
+//@ts-ignore
+import anime from 'animejs/lib/anime.es.js';
 
 export default function EditorContainer() {
   const router = useRouter();
@@ -75,7 +78,50 @@ export default function EditorContainer() {
     handleGetComponentInfo();
   }, []);
 
+  useFavicon();
+
   const { alertVDom } = useAlert({});
+
+  const resizablePanelRef = useRef<any>(null);
+  const throttle = useRef<any>(null);
+  const resizableTouchHandle = () => {
+    if (!resizablePanelRef.current) return;
+    if (throttle.current) return;
+    throttle.current = 1;
+    let obj = { value: resizablePanelRef.current.getSize() };
+    if (resizablePanelRef.current?.getSize() >= 50) {
+      anime({
+        targets: obj,
+        value: 0,
+        duration: 300,
+        easing: 'easeOutQuad',
+        update: function () {
+          resizablePanelRef.current.resize(obj.value);
+        },
+        complete: function () {
+          throttle.current = null;
+        },
+      });
+    } else {
+      anime({
+        targets: obj,
+        value: 100,
+        duration: 300,
+        easing: 'easeOutQuad',
+        update: function () {
+          resizablePanelRef.current.resize(obj.value);
+        },
+        complete: function () {
+          throttle.current = null;
+        },
+      });
+    }
+  };
+  useEffect(() => {
+    if (innerWidth <= 640) {
+      resizablePanelRef.current.resize(0);
+    }
+  }, []);
 
   return (
     <div className="h-[100vh] w-[100vw] flex flex-col select-none">
@@ -142,10 +188,10 @@ export default function EditorContainer() {
         )}
       </div>
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel>
+        <ResizablePanel ref={resizablePanelRef}>
           <Editor></Editor>
         </ResizablePanel>
-        <ResizableHandle withHandle={true} />
+        <ResizableHandle withHandle={true} touchHandle={resizableTouchHandle} />
         <ResizablePanel>
           <Viewer></Viewer>
         </ResizablePanel>

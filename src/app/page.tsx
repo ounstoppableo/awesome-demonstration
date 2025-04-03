@@ -46,6 +46,7 @@ import {
 } from '@/components/confetti';
 import usePageCarouselLogic from './hooks/usePageCarouselLogic';
 import { Input } from '@/components/suffix-input';
+import useFavicon from './hooks/useFavIcon';
 
 export default function MainPage() {
   const theme = useAppSelector(selectTheme);
@@ -232,17 +233,7 @@ export default function MainPage() {
     token && localStorage.setItem('token', token);
   }, []);
 
-  useEffect(() => {
-    document.getElementById('iconLink')?.remove();
-    const favicon = document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.id = 'iconLink';
-    favicon.href = 'https://www.unstoppable840.cn/assets/favicon.ico';
-    document.head.appendChild(favicon);
-    return () => {
-      document.getElementById('iconLink')?.remove();
-    };
-  }, []);
+  useFavicon();
 
   const { getBackgroundEffect } = useBackground({ container: 'background' });
 

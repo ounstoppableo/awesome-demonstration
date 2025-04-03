@@ -11,6 +11,7 @@ import ParseStringToComponent from '@/utils/parseStringToComponent/parseStringTo
 import NotFound from '@/components/not-found';
 import { v4 as uuidv4 } from 'uuid';
 import ErrorBoundary from './errorBoundary';
+import useFavicon from '../hooks/useFavIcon';
 
 function useDeepCompareEffect(
   callback: (...params: any) => any,
@@ -120,6 +121,8 @@ export default function Viewer() {
   useEffect(() => {
     setRandomKey(Math.random());
   }, [Root]);
+
+  useFavicon();
 
   const safeResult = () => {
     try {
