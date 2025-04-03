@@ -27,6 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <script src="/iconfont/iconfont.js"></script>
         <script src="/particles.js"></script>
         <title>Awesome Demostration</title>
