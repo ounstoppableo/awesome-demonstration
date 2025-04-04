@@ -40,9 +40,9 @@ const ResizableHandle = ({
       {withHandle && (
         <div
           onTouchEnd={touchHandle}
-          className="z-[9999] flex h-4 w-3 items-center justify-center rounded-sm border bg-border"
+          className="z-[9999] flex h-4 w-3 max-sm:h-8 max-sm:w-6 items-center justify-center rounded-sm border bg-border"
         >
-          <GripVertical className="h-2.5 w-2.5" />
+          <GripVertical className="h-2.5 w-2.5 max-sm:h-5 max-sm:w-5" />
         </div>
       )}
     </ResizablePrimitive.PanelResizeHandle>

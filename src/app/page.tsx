@@ -249,7 +249,7 @@ export default function MainPage() {
   } = useAddComponentForm({ setDialogOpen });
 
   return (
-    <div className="h-[100vh] w-[100vw] overflow-hidden">
+    <div className="h-[100dvh] w-[100dvw] overflow-hidden">
       {alertVDom}
       <div className="flex flex-col items-center justify-center gap-[8%] absolute inset-0 overflow-hidden">
         <div className="w-full">{carousel}</div>

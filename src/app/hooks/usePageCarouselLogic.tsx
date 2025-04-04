@@ -10,7 +10,6 @@ import {
 import { formatDataToViewerAdaptor } from '@/utils/dataFormat';
 import Viewer from '@/components/viewer/viewer';
 import { Carousel } from '@/components/carousel/carousel';
-import { current } from '@reduxjs/toolkit';
 
 export default function usePageCarouselLogic(props: any) {
   const { loading, setLoading, router } = props;

@@ -124,7 +124,7 @@ export default function EditorContainer() {
   }, []);
 
   return (
-    <div className="h-[100vh] w-[100vw] flex flex-col select-none">
+    <div className="h-[100dvh] w-[100dvw] flex flex-col select-none">
       {alertVDom}
       <div className="py-2 px-0.5 flex justify-between border items-center relative">
         <Button
