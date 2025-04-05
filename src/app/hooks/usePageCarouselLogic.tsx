@@ -161,8 +161,13 @@ export default function usePageCarouselLogic(props: any) {
   }, [slideData.length]);
 
   useEffect(() => {
-    if (lastPage && lastPage <= shouldAddpage)
-      requestIdleCallback(() => setCarouselAnimate(true));
+    if (lastPage && lastPage <= shouldAddpage) {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => setCarouselAnimate(true));
+      } else {
+        setTimeout(() => setCarouselAnimate(true), 0);
+      }
+    }
   }, [lastPage]);
 
   const [searchComponentName, setSearchComponentName] = useState('');
