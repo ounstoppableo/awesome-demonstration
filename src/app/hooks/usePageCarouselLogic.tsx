@@ -199,6 +199,7 @@ export default function usePageCarouselLogic(props: any) {
   const handleRandom = () => {
     setLoading(true);
     setRandom(true);
+    setSearchResIndex(null);
     randomComponent().then((res) => {
       if (res.code === 200) {
         setRandomList(res.data);
