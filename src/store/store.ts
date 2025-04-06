@@ -3,6 +3,7 @@ import backgroundEffectsReducer from './background-effects/background-effects-sl
 import themeReducer from './theme/theme-slice';
 import componentInfoReducer from './component-info/component-info-slice';
 import alertReducer from './alert/alert-slice';
+import homePageKeepAliveStateReducer from './home-page-keep-alive/home-page-keep-alive-slice';
 
 // ...
 export const makeStore = () => {
@@ -12,6 +13,7 @@ export const makeStore = () => {
       theme: themeReducer,
       componentInfo: componentInfoReducer,
       alert: alertReducer,
+      homePageKeepAlive: homePageKeepAliveStateReducer,
     },
   });
 };

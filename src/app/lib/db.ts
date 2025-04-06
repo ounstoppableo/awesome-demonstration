@@ -7,7 +7,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 10, // 限制最大连接数
+  connectionLimit: 5, // 限制最大连接数
   queueLimit: 0,
 });
 

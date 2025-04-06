@@ -86,20 +86,22 @@ export default function Viewer() {
   useDeepCompareEffect(async () => {
     if (componentInfo.id) {
       try {
-        const parseStringToComponent = new ParseStringToComponent(
-          componentInfo,
-        );
-        const components = await parseStringToComponent.parseToComponent(
-          componentInfo.fileContentsMap[componentInfo.entryFile],
-          'Root',
-        );
-        setRoot(
-          React.forwardRef(
-            components[
-              Object.keys(components)?.[Object.keys(components)?.length - 1]
-            ],
-          ) as any,
-        );
+        if (componentInfo.fileContentsMap[componentInfo.entryFile]) {
+          const parseStringToComponent = new ParseStringToComponent(
+            componentInfo,
+          );
+          const components = await parseStringToComponent.parseToComponent(
+            componentInfo.fileContentsMap[componentInfo.entryFile],
+            'Root',
+          );
+          setRoot(
+            React.forwardRef(
+              components[
+                Object.keys(components)?.[Object.keys(components)?.length - 1]
+              ],
+            ) as any,
+          );
+        }
         window.parent.postMessage(
           {
             type: 'componentLoadCompleted',

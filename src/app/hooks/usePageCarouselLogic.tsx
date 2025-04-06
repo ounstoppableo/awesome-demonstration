@@ -10,21 +10,63 @@ import {
 import { formatDataToViewerAdaptor } from '@/utils/dataFormat';
 import Viewer from '@/components/viewer/viewer';
 import { Carousel } from '@/components/carousel/carousel';
+import { useDispatch } from 'react-redux';
+import {
+  selectHomePageKeepAliveComponetListRaw,
+  selectHomePageKeepAliveCurrentCarusalIndex,
+  selectHomePageKeepAliveLastPage,
+  selectHomePageKeepAliveRandom,
+  selectHomePageKeepAliveRandomList,
+  selectHomePageKeepAliveShouldAddpage,
+  setComponetListRawInStore,
+  setCurrentCarusalIndexwInStore,
+  setLastPageInStore,
+  setRandomInStore,
+  setRandomListInStore,
+  setShouldAddpageInStore,
+} from '@/store/home-page-keep-alive/home-page-keep-alive-slice';
+import { useAppSelector } from '@/store/hooks';
+import { setAlert, setAlertMsg } from '@/store/alert/alert-slice';
 
 export default function usePageCarouselLogic(props: any) {
   const { loading, setLoading, router } = props;
   const carouselRef = useRef<any>(null);
-  const [slideData, setSlideData] = useState([]);
-  const [shouldAddpage, setshouldAddpage] = useState(1);
-  const [componetListRaw, setComponentListRaw] = useState<any>({});
-  const [componentList, setComponentList] = useState<any>([]);
-  const [currentCarusalIndex, setCurrentCarusalIndex] = useState(0);
-  const [carouselAnimate, setCarouselAnimate] = useState(true);
   const { limit } = useGetComponentLimitCount({});
+  const [slideData, setSlideData] = useState([]);
+  const [componentList, setComponentList] = useState<any>([]);
+  const [carouselAnimate, setCarouselAnimate] = useState(true);
   const [searchResIndex, setSearchResIndex] = useState<any>(null);
-  const [random, setRandom] = useState(false);
-  const [randomList, setRandomList] = useState([]);
-  const [lastPage, setLastPage] = useState<any>(null);
+
+  const random = useAppSelector(selectHomePageKeepAliveRandom);
+  const randomList = useAppSelector(selectHomePageKeepAliveRandomList);
+  const lastPage = useAppSelector(selectHomePageKeepAliveLastPage);
+  const shouldAddpage = useAppSelector(selectHomePageKeepAliveShouldAddpage);
+  const componetListRaw = useAppSelector(
+    selectHomePageKeepAliveComponetListRaw,
+  );
+  const currentCarusalIndex = useAppSelector(
+    selectHomePageKeepAliveCurrentCarusalIndex,
+  );
+  const dispatch = useDispatch();
+
+  const setRandom = (random: boolean) => {
+    dispatch(setRandomInStore(random));
+  };
+  const setRandomList = (randomList: any[]) => {
+    dispatch(setRandomListInStore(randomList));
+  };
+  const setLastPage = (lastPage: null | number) => {
+    dispatch(setLastPageInStore(lastPage));
+  };
+  const setShouldAddpage = (shouldAddpage: number) => {
+    dispatch(setShouldAddpageInStore(shouldAddpage));
+  };
+  const setComponentListRaw = (componentListRaw: any) => {
+    dispatch(setComponetListRawInStore(componentListRaw));
+  };
+  const setCurrentCarusalIndex = (currentCarusalIndex: number) => {
+    dispatch(setCurrentCarusalIndexwInStore(currentCarusalIndex));
+  };
 
   const handleSetComponentList = () => {
     if (
@@ -51,7 +93,6 @@ export default function usePageCarouselLogic(props: any) {
       }
     });
   };
-
   const handleGenerateCarusalData = async () => {
     const slideData: any = await Promise.all(
       componentList.map(async (item: any, index: any) => {
@@ -96,7 +137,6 @@ export default function usePageCarouselLogic(props: any) {
     );
     setSlideData(slideData);
   };
-
   const setComponentListFromRaw = () => {
     setComponentList(
       random
@@ -116,8 +156,8 @@ export default function usePageCarouselLogic(props: any) {
   }, [limit, shouldAddpage]);
 
   useEffect(() => {
-    setCurrentCarusalIndex(0);
     setLastPage(null);
+    setSearchResIndex(null);
   }, [limit]);
 
   useEffect(() => {
@@ -141,14 +181,14 @@ export default function usePageCarouselLogic(props: any) {
     const startIndex = (currentPage - 1) * limit;
     const endIndex = currentPage * limit - 1;
     if (currentCarusalIndex >= endIndex - Math.floor(limit / 2)) {
-      setshouldAddpage(currentPage + 1);
+      setShouldAddpage(currentPage + 1);
       return;
     }
     if (currentCarusalIndex <= startIndex + Math.floor(limit / 2)) {
-      setshouldAddpage(currentPage === 1 ? 1 : currentPage - 1);
+      setShouldAddpage(currentPage === 1 ? 1 : currentPage - 1);
       return;
     }
-    setshouldAddpage(currentPage);
+    setShouldAddpage(currentPage);
   }, [currentCarusalIndex, limit, random]);
 
   useEffect(() => {
@@ -189,6 +229,8 @@ export default function usePageCarouselLogic(props: any) {
           if (res.data.pageList < limit) setLastPage(res.data.page);
         } else {
           setLoading(false);
+          dispatch(setAlert({ value: true, type: 'warning' }));
+          dispatch(setAlertMsg('没有这样的组件o~'));
         }
         setSearchResIndex(res.data.index);
         setSearchComponentName('');
@@ -221,7 +263,6 @@ export default function usePageCarouselLogic(props: any) {
   useEffect(() => {
     if (!random) {
       setComponentListFromRaw();
-      setCurrentCarusalIndex(0);
     }
   }, [random]);
 
@@ -237,11 +278,13 @@ export default function usePageCarouselLogic(props: any) {
   );
 
   return {
+    random,
     carousel,
     handleSearch,
     searchComponentName,
     currentCarusalIndex,
     setSearchComponentName,
+    setCurrentCarusalIndex,
     handleRandom,
     setRandom,
   };

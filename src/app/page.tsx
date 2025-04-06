@@ -58,11 +58,13 @@ export default function MainPage() {
   usePersistTheme();
 
   const {
+    random,
     setRandom,
     carousel,
     handleSearch,
     searchComponentName,
     setSearchComponentName,
+    setCurrentCarusalIndex,
     handleRandom,
   } = usePageCarouselLogic({
     loading,
@@ -151,6 +153,7 @@ export default function MainPage() {
       },
       handleClick: () => {
         (inputRef.current as any)?.focus();
+        if (random) setCurrentCarusalIndex(0);
         setRandom(false);
       },
       href: '#',

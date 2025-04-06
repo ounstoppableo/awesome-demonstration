@@ -20,11 +20,19 @@ export async function GET(req: NextRequest) {
             [scope, fileName],
           );
           result = (rows as any)[0];
-          if (!result)
+          if (!result) {
+            await client.set(
+              `fileMap:${scope}:${fileName}`,
+              JSON.stringify(''),
+              {
+                EX: 60 * 60,
+              },
+            );
             return handleCompleted({
               msg: '查询成功!',
               data: { fileContent: '' },
             });
+          }
           await client.set(
             `fileMap:${scope}:${fileName}`,
             JSON.stringify(result),

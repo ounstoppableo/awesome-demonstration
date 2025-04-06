@@ -32,11 +32,13 @@ const messageHandler = async (e: any) => {
   if (e.data.type === 'updateViewer') {
     try {
       viewInfoStoreState.setViewInfo(e.data.viewInfo);
-      const parseStringToComponent = new ParseStringToComponent(app);
-      await parseStringToComponent.parseToComponent(
-        viewInfoStoreState.getRootContent,
-        'viewerRoot',
-      );
+      if (viewInfoStoreState.getRootContent) {
+        const parseStringToComponent = new ParseStringToComponent(app);
+        await parseStringToComponent.parseToComponent(
+          viewInfoStoreState.getRootContent,
+          'viewerRoot',
+        );
+      }
       randomKey.value = Math.random();
       componentName.value = 'viewerRoot';
       window.parent.postMessage(
