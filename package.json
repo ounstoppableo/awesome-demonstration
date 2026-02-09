@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"node server.js -h 0.0.0.0\"  \"lerna run dev\" --paralle",
+    "build:microApp": "cross-env-shell NODE_OPTIONS=--max-old-space-size=2048 NEXT_CPU_COUNT=1 \"lerna run build\"",
+    "build:next": "cross-env-shell NODE_OPTIONS=--max-old-space-size=2048 NEXT_CPU_COUNT=1 \"next build\"",
     "build": "cross-env-shell NODE_OPTIONS=--max-old-space-size=2048 NEXT_CPU_COUNT=1 \"lerna run build && next build\"",
     "start": "node start-next.mjs",
     "lint": "next lint"
