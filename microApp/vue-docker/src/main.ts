@@ -13,7 +13,10 @@ app.use(pinia);
 app.config.errorHandler = (err: any, instance, info) => {
   window.parent.postMessage(
     { type: 'handleCompileError', data: err.message },
-    location.protocol + '//' + location.hostname + ':7777',
+    location.protocol +
+      '//' +
+      location.hostname +
+      `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`,
   );
 };
 

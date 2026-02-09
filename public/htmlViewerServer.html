@@ -43,6 +43,7 @@
     </style>
   </head>
   <body>
+    <script src="/env.js"></script>
     <script>
       const getFileContent = async (params) => {
         return await fetch(
@@ -59,7 +60,7 @@
       const messageHandler = async (e) => {
         if (
           e.origin !==
-          location.protocol + '//' + location.hostname + ':7777'
+          location.protocol + '//' + location.hostname + `:${window.NEXT_PUBLIC_SERVER_PORT}`
         ) {
           console.warn('拒绝来自不安全域的消息:', e.origin);
           return;
@@ -144,7 +145,7 @@
                 data: '组件加载完成~',
                 id: soleId,
               },
-              location.protocol + '//' + location.hostname + ':7777',
+              location.protocol + '//' + location.hostname +`:${window.NEXT_PUBLIC_SERVER_PORT}`,
             );
           } catch (err) {
             window.parent.postMessage(
@@ -153,7 +154,7 @@
                 data: err.message,
                 id: soleId,
               },
-              location.protocol + '//' + location.hostname + ':7777',
+              location.protocol + '//' + location.hostname + `:${window.NEXT_PUBLIC_SERVER_PORT}`,
             );
           }
         }
@@ -177,7 +178,7 @@
               id: soleId,
               secondHandshakeId: e.data.id,
             },
-            location.protocol + '//' + location.hostname + ':7777',
+            location.protocol + '//' + location.hostname + `:${window.NEXT_PUBLIC_SERVER_PORT}`,
           );
         }
         if (e.data.type === 'unMounted') {
@@ -188,7 +189,7 @@
       const soleId = Math.random().toString(36).slice(2);
       window.parent.postMessage(
         { type: 'frameworkReady', data: '我准备好了~', id: soleId },
-        location.protocol + '//' + location.hostname + ':7777',
+        location.protocol + '//' + location.hostname + `:${window.NEXT_PUBLIC_SERVER_PORT}`,
       );
       window.id = soleId;
       window.addEventListener('message', messageHandler);

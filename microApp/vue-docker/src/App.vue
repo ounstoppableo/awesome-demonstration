@@ -15,7 +15,10 @@ const viewInfoStoreState = useViewInfoStoreStore();
 app.config.errorHandler = (err: any, instance: any, info: any) => {
   window.parent.postMessage(
     { type: 'handleCompileError', data: err.message, id: soleId.value },
-    location.protocol + '//' + location.hostname + ':7777',
+    location.protocol +
+      '//' +
+      location.hostname +
+      `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`,
   );
 };
 
@@ -25,7 +28,13 @@ const gc = () => {
 };
 
 const messageHandler = async (e: any) => {
-  if (e.origin !== location.protocol + '//' + location.hostname + ':7777') {
+  if (
+    e.origin !==
+    location.protocol +
+      '//' +
+      location.hostname +
+      `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`
+  ) {
     console.warn('拒绝来自不安全域的消息:', e.origin);
     return;
   }
@@ -47,12 +56,18 @@ const messageHandler = async (e: any) => {
           data: '组件加载完成~',
           id: soleId.value,
         },
-        location.protocol + '//' + location.hostname + ':7777',
+        location.protocol +
+          '//' +
+          location.hostname +
+          `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`,
       );
     } catch (err: any) {
       window.parent.postMessage(
         { type: 'handleCompileError', data: err.message, id: soleId.value },
-        location.protocol + '//' + location.hostname + ':7777',
+        location.protocol +
+          '//' +
+          location.hostname +
+          `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`,
       );
     }
   }
@@ -75,7 +90,10 @@ const messageHandler = async (e: any) => {
         id: soleId.value,
         secondHandshakeId: e.data.id,
       },
-      location.protocol + '//' + location.hostname + ':7777',
+      location.protocol +
+        '//' +
+        location.hostname +
+        `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`,
     );
   }
   if (e.data.type === 'unMounted') {
@@ -87,7 +105,10 @@ onMounted(() => {
   window.addEventListener('message', messageHandler);
   window.parent.postMessage(
     { type: 'frameworkReady', data: '我准备好了~', id: soleId.value },
-    location.protocol + '//' + location.hostname + ':7777',
+    location.protocol +
+      '//' +
+      location.hostname +
+      `:${import.meta.env.VITE_PUBLIC_NEXT_SERVER_PORT}`,
   );
   (window as any).id = soleId.value;
 });

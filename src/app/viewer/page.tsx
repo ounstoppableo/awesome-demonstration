@@ -44,7 +44,13 @@ export default function Viewer() {
     );
     (window as any).id = soleId.current;
     const handleMsgCb = async (e: any) => {
-      if (e.origin !== location.protocol + '//' + location.hostname + ':7777') {
+      if (
+        e.origin !==
+        location.protocol +
+          '//' +
+          location.hostname +
+          `:${process.env.NEXT_PUBLIC_SERVER_PORT}`
+      ) {
         console.warn('拒绝来自不安全域的消息:', e.origin);
         return;
       }
@@ -71,7 +77,10 @@ export default function Viewer() {
             id: soleId.current,
             secondHandshakeId: e.data.id,
           },
-          location.protocol + '//' + location.hostname + ':7777',
+          location.protocol +
+            '//' +
+            location.hostname +
+            `:${process.env.NEXT_PUBLIC_SERVER_PORT}`,
         );
       }
       if (e.data.type === 'unMounted') {

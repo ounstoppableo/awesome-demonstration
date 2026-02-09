@@ -29,15 +29,22 @@ export default function Viewer(props: {
   let framework: any;
   const getServerAddr = (framework: 'vue' | 'html' | 'react') => {
     return framework === 'vue'
-      ? location.protocol + '//' + location.hostname + ':11451'
+      ? location.protocol +
+          '//' +
+          location.hostname +
+          `:${process.env.NEXT_PUBLIC_VUE_DOCKER_PORT}`
       : framework === 'html'
         ? location.protocol +
           '//' +
           location.hostname +
-          ':7777/' +
+          `:${process.env.NEXT_PUBLIC_SERVER_PORT}/` +
           'htmlViewerServer.html'
         : framework === 'react'
-          ? location.protocol + '//' + location.hostname + ':7777/' + 'viewer'
+          ? location.protocol +
+            '//' +
+            location.hostname +
+            `:${process.env.NEXT_PUBLIC_SERVER_PORT}/` +
+            'viewer'
           : '';
   };
 
@@ -114,7 +121,12 @@ export default function Viewer(props: {
       {framework === 'vue' ? (
         <iframe
           ref={iframeRef}
-          src={location.protocol + '//' + location.hostname + ':11451'}
+          src={
+            location.protocol +
+            '//' +
+            location.hostname +
+            `:${process.env.NEXT_PUBLIC_VUE_DOCKER_PORT}`
+          }
           className="w-full h-full"
         ></iframe>
       ) : framework === 'html' ? (
@@ -124,7 +136,7 @@ export default function Viewer(props: {
             location.protocol +
             '//' +
             location.hostname +
-            ':7777/' +
+            `:${process.env.NEXT_PUBLIC_SERVER_PORT}/` +
             'htmlViewerServer.html'
           }
           className="w-full h-full"
@@ -133,7 +145,11 @@ export default function Viewer(props: {
         <iframe
           ref={iframeRef}
           src={
-            location.protocol + '//' + location.hostname + ':7777/' + 'viewer'
+            location.protocol +
+            '//' +
+            location.hostname +
+            `:${process.env.NEXT_PUBLIC_SERVER_PORT}/` +
+            'viewer'
           }
           className="w-full h-full"
         ></iframe>

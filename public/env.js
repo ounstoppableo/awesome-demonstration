@@ -1,0 +1,1 @@
+window.NEXT_PUBLIC_SERVER_PORT = 7777;
