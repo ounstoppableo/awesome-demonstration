@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently \"node server.js -h 0.0.0.0\"  \"lerna run dev\" --paralle",
     "build": "next build && lerna run build",
-    "start": "next start -p 4444",
+    "start": "dotenv -e .env.local -- cross-env-shell \"next start -p $NEXT_PUBLIC_SERVER_PORT\"",
     "lint": "next lint"
   },
   "workspaces": [
@@ -83,6 +83,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9.1.2",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "lerna": "^8.1.9",

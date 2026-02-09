@@ -68,7 +68,7 @@ DB_NAME=awesome_demonstration
 
 AUTH_ADDR=token认证地址，这个需要自己实现（用于文件上传、组件添加等接口）
 
-SERVER_PORT=应用启动端口
+NEXT_PUBLIC_SERVER_PORT=应用启动端口
 
 REDIS_HOST=redis服务域名
 REDIS_PORT=redis服务端口

@@ -29,8 +29,8 @@ app.prepare().then(async () => {
         handle(req, res);
       },
     )
-    .listen(process.env.SERVER_PORT, (err) => {
+    .listen(process.env.NEXT_PUBLIC_SERVER_PORT, (err) => {
       if (err) throw err;
-      console.log(`> Ready on PORT ${process.env.SERVER_PORT}`);
+      console.log(`> Ready on PORT ${process.env.NEXT_PUBLIC_SERVER_PORT}`);
     });
 });
