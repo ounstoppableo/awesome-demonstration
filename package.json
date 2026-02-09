@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"node server.js -h 0.0.0.0\"  \"lerna run dev\" --paralle",
-    "build": "next build",
+    "build": "next build && lerna run build",
     "start": "next start -p 4444",
     "lint": "next lint"
   },
