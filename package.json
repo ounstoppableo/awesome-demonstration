@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"node server.js -h 0.0.0.0\"  \"lerna run dev\" --paralle",
-    "build": "lerna run build && next build",
+    "build": "cross-env-shell NODE_OPTIONS=--max-old-space-size=2048 NEXT_CPU_COUNT=1 \"lerna run build && next build\"",
     "start": "node start-next.mjs",
     "lint": "next lint"
   },
@@ -83,6 +83,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9.1.2",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.4",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9",
